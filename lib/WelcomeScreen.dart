@@ -26,7 +26,8 @@ class WelcomeScreen extends StatelessWidget {
        child: Column(
          children: [
            const Padding(
-             padding: EdgeInsets.only(top: 200.0),
+             padding: EdgeInsets.only(top: 150.0),
+             child: Image(image: AssetImage('assets/logo.png')),
            ),
            const SizedBox(
              height: 100,
