@@ -6,7 +6,7 @@ class Product extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple[200]
+      backgroundColor: Colors.purple[250]
       
     );
   }
