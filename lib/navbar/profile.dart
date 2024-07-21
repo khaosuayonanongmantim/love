@@ -6,7 +6,7 @@ class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple[100]
+      backgroundColor: Colors.purple[200]
       
     );
   }
