@@ -4,7 +4,7 @@ class RegScreen extends StatelessWidget {
   const RegScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {   
     return Scaffold(
         body: Stack(//thanks for watching
           children: [
