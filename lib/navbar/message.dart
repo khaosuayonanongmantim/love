@@ -6,7 +6,7 @@ class Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple[100]
+      backgroundColor: const Color.fromARGB(255, 190, 215, 231)
       
     );
   }
