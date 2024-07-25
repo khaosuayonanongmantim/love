@@ -85,15 +85,10 @@ class WelcomeScreen extends StatelessWidget {
              child: Container(
                height: 53,
                width: 320,
-               decoration: BoxDecoration(
-                 color: Colors.white,
-                 borderRadius: BorderRadius.circular(30),
-                 border: Border.all(color: Colors.white),
-               ),
                child: const Center(child: Text('Coming Home',style: TextStyle(
                    fontSize: 20,
                    fontWeight: FontWeight.bold,
-                   color: Colors.black
+                   color: Colors.white,
                ),),),
              ),
            ),
