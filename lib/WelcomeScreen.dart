@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_new/bottom_navber.dart';
 import 'package:project_new/regScreen.dart';
-
 import 'loginScreen.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -59,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
            GestureDetector(
              onTap: (){
                Navigator.push(context,
-                   MaterialPageRoute(builder: (context) => const BottomNavbar()));
+                   MaterialPageRoute(builder: (context) => const RegScreen()));
              },
              child: Container(
                height: 53,
@@ -76,6 +75,31 @@ class WelcomeScreen extends StatelessWidget {
                ),),),
              ),
            ),
+           
+            const SizedBox(height: 30,),
+           GestureDetector(
+             onTap: (){
+               Navigator.push(context,
+                   MaterialPageRoute(builder: (context) => const BottomNavbar()));
+             },
+             child: Container(
+               height: 53,
+               width: 320,
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 borderRadius: BorderRadius.circular(30),
+                 border: Border.all(color: Colors.white),
+               ),
+               child: const Center(child: Text('Coming Home',style: TextStyle(
+                   fontSize: 20,
+                   fontWeight: FontWeight.bold,
+                   color: Colors.black
+               ),),),
+             ),
+           ),
+
+
+
            const Spacer(),
            const Text('Login with Social Media',style: TextStyle(
                fontSize: 17,
