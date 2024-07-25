@@ -31,7 +31,7 @@ class WelcomeScreen extends StatelessWidget {
            const SizedBox(
              height: 100,
            ),
-           const Text('Welcome Back',style: TextStyle(
+           const Text('Welcome eiei',style: TextStyle(
              fontSize: 30,
              color: Colors.white
            ),),
