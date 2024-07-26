@@ -31,13 +31,22 @@ class _BottomNavbarState extends State<BottomNavbar> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
-              'assets/logo.png', // ใส่เส้นทางไปยังไฟล์รูปภาพของคุณ
-              height: 100,
+              'assets/logocon.png', // ใส่เส้นทางไปยังไฟล์รูปภาพของคุณ
+              height: 35,
             ),
             const SizedBox(width: 10),
+            const Text(
+              '❖ 𝐈𝐧𝐭𝐞𝐫𝐠𝐞𝐭𝐡𝐞𝐫 ❖', // ใส่ชื่อแอปของคุณ
+              style: TextStyle(
+                color: Colors.black, // เปลี่ยนสีข้อความ
+                fontWeight: FontWeight.bold, // ความหนาของข้อความ
+                fontSize: 20, // ขนาดของข้อความ
+              ),
+              
+            ),
           ],
         ),
-        backgroundColor: Colors.white, // เปลี่ยนสีของ AppBar
+        backgroundColor: Color.fromARGB(255, 178, 197, 201), // เปลี่ยนสีของ AppBar
       ),
       bottomNavigationBar: Container(
         margin: const EdgeInsets.symmetric(
