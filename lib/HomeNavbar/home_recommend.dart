@@ -25,11 +25,12 @@ class _RecommendedHomeState extends State<RecommendedHome> {
             ),
           ),
         ),
+        
         SizedBox(height: 10),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: [
+            children: [//อยู่หลังบ้าน (รอ)
               buildVerticalImageWithText('assets/nunew.jpg', '"Concert 1"', 'November 20, 2024','15.00 น.-22.00 น.','สนามราชมังคลา'),
               buildVerticalImageWithText('assets/chang.jpg', '"Concert 2"', 'December 5, 2024','15.00 น.-22.00 น.','Impact Arena เมืองทอง'),
               buildVerticalImageWithText('assets/war.jpg', '"Concert 3"', 'January 15, 2025','15.00 น.-22.00 น.','Indoor stadiam หัวหมาก'),
@@ -41,6 +42,18 @@ class _RecommendedHomeState extends State<RecommendedHome> {
               buildVerticalImageWithText('assets/cocktail.jpg', '"Concert 9"', 'July 4, 2025','15.00 น.-22.00 น.','เมืองไทยรัชดาลัย'),
               buildVerticalImageWithText('assets/scrub.jpg', '"Concert 10"', 'August 15, 2025','15.00 น.-22.00 น.','เอ็มซีซี ฮอลล์'),
             ],
+          ),
+        ),
+          SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            "ดูเพิ่มเติม ",
+            style: TextStyle(
+              color: Colors.pinkAccent,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -132,6 +145,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
               ],
             ),
           ),
+          
         ],
         
       ),

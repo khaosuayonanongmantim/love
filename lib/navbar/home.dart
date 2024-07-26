@@ -15,7 +15,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.purple[100],
       body: SingleChildScrollView( //เลื่อนลงมาข้างล่างได้
         padding: EdgeInsets.only(top: 30), // เพิ่ม padding ด้านบน
         child: Align(
@@ -106,7 +106,7 @@ class _HomeState extends State<Home> {
                 ],
               ),
               SizedBox(height: 30), // เพิ่มระยะห่างระหว่างข้อความ
-              Container(
+              Container(//รูปสำหรับต่อหลังบ้าน (รอ...)
                 height: 200, // กำหนดความสูงของพื้นที่รูปภาพ
                 child: PageView(
                   controller: _controller, // รูปภาพเลื่อนได้
