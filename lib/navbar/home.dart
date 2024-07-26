@@ -47,7 +47,7 @@ class _HomeState extends State<Home> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(30), // กำหนดให้มีความโค้ง
                       border: Border.all(
                         color: Colors.greenAccent, // กำหนดสีของกรอบนอก
@@ -57,7 +57,7 @@ class _HomeState extends State<Home> {
                     child: Text(
                       "Concert",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.purpleAccent,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -67,7 +67,7 @@ class _HomeState extends State<Home> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
                         color: Colors.purpleAccent, // กำหนดสีของกรอบนอก
@@ -77,7 +77,7 @@ class _HomeState extends State<Home> {
                     child: Text(
                       "Sport",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.purpleAccent,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -87,7 +87,7 @@ class _HomeState extends State<Home> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
                         color: Colors.blueAccent, // กำหนดสีของกรอบนอก
@@ -97,7 +97,7 @@ class _HomeState extends State<Home> {
                     child: Text(
                       "Nightclub",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.purpleAccent,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
