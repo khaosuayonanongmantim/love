@@ -35,7 +35,7 @@ class _HomeState extends State<Home> {
               Text(
                 "MUSIC FESTIVAL",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
