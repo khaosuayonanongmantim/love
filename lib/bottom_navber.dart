@@ -46,7 +46,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
             ),
           ],
         ),
-        backgroundColor: Color.fromARGB(255, 178, 197, 201), // เปลี่ยนสีของ AppBar
+        backgroundColor: Colors.white // เปลี่ยนสีของ AppBar
       ),
       bottomNavigationBar: Container(
         margin: const EdgeInsets.symmetric(
