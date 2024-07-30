@@ -17,153 +17,48 @@ class Message extends StatelessWidget {
             child: PageView(
               controller: _controller, // รูปภาพเลื่อนได้
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/nunew.jpg', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/chang.jpg', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/war.jpg', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/cat.jpg', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/piano.jpg', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/kini.png', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/wan.jpg', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/threemandown.jpg', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/cocktail.jpg', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
-                      borderRadius: BorderRadius.circular(20), // ความโค้งมน
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
-                      child: Image.asset('assets/scrub.jpg', fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
+                buildImageContainer('assets/nunew.jpg'),
+                buildImageContainer('assets/chang.jpg'),
+                buildImageContainer('assets/war.jpg'),
+                buildImageContainer('assets/cat.jpg'),
+                buildImageContainer('assets/piano.jpg'),
+                buildImageContainer('assets/kini.png'),
+                buildImageContainer('assets/wan.jpg'),
+                buildImageContainer('assets/threemandown.jpg'),
+                buildImageContainer('assets/cocktail.jpg'),
+                buildImageContainer('assets/scrub.jpg'),
               ],
-               children: [
-        SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            "🔥 แนะนำสำหรับคุณ 🔥",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
             ),
           ),
-        ),
+          SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "🔥 แนะนำสำหรับคุณ 🔥",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Padding buildImageContainer(String imagePath) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10), // กำหนดระยะห่างระหว่างรูปภาพ
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Color.fromARGB(255, 10, 9, 9), width: 4), // เส้นขอบ
+          borderRadius: BorderRadius.circular(20), // ความโค้งมน
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16), // ความโค้งมน (ควรเป็นน้อยกว่า borderRadius ของ Container)
+          child: Image.asset(imagePath, fit: BoxFit.cover),
+        ),
       ),
     );
   }
