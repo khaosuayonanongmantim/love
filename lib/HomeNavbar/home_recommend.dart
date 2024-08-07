@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'package:project_new/HomeNavbar/homeconcertandsport.dart';
+import 'package:project_new/HomeNavbar/detail_AllClup.dart';
+import 'package:project_new/HomeNavbar/home_conAndsport.dart';
 
 class RecommendedHome extends StatefulWidget {
   const RecommendedHome({Key? key}) : super(key: key);
@@ -40,13 +41,40 @@ class _RecommendedHomeState extends State<RecommendedHome> {
                 'Impact Arena เมืองทอง',
               ),
               buildVerticalImageWithText(
-                'assets/nunew.jpg',
+                'assets/piano.jpg',
                 '"Concert 1"',
                 'November 20, 2024',
                 '15.00 น.-22.00 น.',
                 'สนามราชมังคลา',
               ),
-              // เพิ่มรายการที่นี่
+               buildVerticalImageWithText(
+                'assets/cat.jpg',
+                '"Concert 1"',
+                'November 20, 2024',
+                '15.00 น.-22.00 น.',
+                'สนามราชมังคลา',
+              ),
+               buildVerticalImageWithText(
+                'assets/cocktail.jpg',
+                '"Concert 1"',
+                'November 20, 2024',
+                '15.00 น.-22.00 น.',
+                'สนามราชมังคลา',
+              ),
+               buildVerticalImageWithText(
+                'assets/kini.png',
+                '"Concert 1"',
+                'November 20, 2024',
+                '15.00 น.-22.00 น.',
+                'สนามราชมังคลา',
+              ),
+               buildVerticalImageWithText(
+                'assets/scrub.jpg',
+                '"Concert 1"',
+                'November 20, 2024',
+                '15.00 น.-22.00 น.',
+                'สนามราชมังคลา',
+              ),
             ],
           ),
         ),
@@ -62,13 +90,13 @@ class _RecommendedHomeState extends State<RecommendedHome> {
                 "🌃 สถานที่บันเทิงยอดนิยม",
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 18,
+                  fontSize: 19,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               InkWell(
                 onTap: () {
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => const Product()),);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailClub()),);
                 },
                 child: Text(
                   "ALL",
@@ -98,7 +126,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
         ),
 
         // การแสดงและกีฬายอดนิยม
-      // HomeConcertAndSport(),
+      HomeConcertAndSport(),
 
       
         
