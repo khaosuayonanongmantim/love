@@ -1,6 +1,7 @@
 import 'dart:async'; // Import dart:async for Timer
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'concert_detail.dart'; // Import the ConcertDetail widget
 
 class HomeConcert extends StatefulWidget {
   const HomeConcert({super.key});
@@ -199,21 +200,15 @@ class _HomeConcertState extends State<HomeConcert> {
                           controller: _controller,
                           count: 10,
                           effect: WormEffect(
-                            dotHeight: 8.0,
-                            dotWidth: 8.0,
-                            activeDotColor: Color.fromARGB(255, 12, 199, 83),
+                            dotHeight: 10,
+                            dotWidth: 10,
+                            spacing: 16,
+                            activeDotColor: Colors.blue,
                             dotColor: Colors.grey,
                           ),
-                          onDotClicked: (index) {
-                            _controller.animateToPage(
-                              index,
-                              duration: Duration(milliseconds: 500),
-                              curve: Curves.easeInOut,
-                            );
-                          },
                         ),
-                        // Highlight Section
-                        Container(
+
+                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Row(
                             children: [
@@ -236,7 +231,7 @@ class _HomeConcertState extends State<HomeConcert> {
                             children: [
                               buildImageWithText('assets/bar4.jpg'),
                               buildImageWithText('assets/bar2.jpg'),
-                              buildImageWithText('assets/bar1.jpg'),
+                              buildImageWithText('assets/heap.jpg'),
                               buildImageWithText('assets/bar3.jpg'),
                               buildImageWithText('assets/party.jpg'),
                               buildImageWithText('assets/bar.jpg'),
@@ -244,7 +239,7 @@ class _HomeConcertState extends State<HomeConcert> {
                             ],
                           ),
                         ),
-                        // Related Topics Section
+
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Row(
@@ -277,20 +272,17 @@ class _HomeConcertState extends State<HomeConcert> {
                             ),
                           ),
                         ),
-                        // Display items based on selected category
-                        Column(
-                          children: categoryItems[selectedCategory]!
-                              .map((item) => buildImageWithTextAndBox(
-                                    imagePath: item['imagePath']!,
-                                    text1: item['text1']!,
-                                    text2: item['text2']!,
-                                    text3: item['text3']!,
-                                    text4: item['text4']!,
-                                    boxColor: Color(int.parse(item['boxColor']!)),
-                                    textColor: Color(int.parse(item['textColor']!)),
-                                  ))
-                              .toList(),
+                        const SizedBox(height: 20),
+                        // Content List
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Column(
+                            children: categoryItems[selectedCategory]!
+                                .map((item) => buildImageWithTextAndBox(item))
+                                .toList(),
+                          ),
                         ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -299,56 +291,6 @@ class _HomeConcertState extends State<HomeConcert> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget buildCarouselItem(String imagePath) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Image.asset(
-          imagePath,
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-
-  Widget buildImageWithText(String imagePath) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Container(
-        width: 150,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.cover,
-          ),
-        ),
       ),
     );
   }
@@ -403,99 +345,157 @@ class _HomeConcertState extends State<HomeConcert> {
   );
 }
 
-
-  Widget buildImageWithTextAndBox({
-  required String imagePath,
-  required String text1,
-  required String text2,
-  required String text3,
-  required String text4,
-  required Color boxColor,
-  required Color textColor,
-}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-    child: Container(
-      decoration: BoxDecoration(
-        color: boxColor,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
+   Widget buildImageWithText(String imagePath) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Container(
+        width: 150,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Image.asset(
+            imagePath,
+            fit: BoxFit.cover,
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildCarouselItem(String imagePath) {
+    return Container(
+      margin: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(imagePath),
+          fit: BoxFit.cover,
+        ),
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+    );
+  }
+
+  Widget _buildCategoryButton(String category) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedCategory = category;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        decoration: BoxDecoration(
+          color: selectedCategory == category ? Colors.blue : Colors.white,
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(
+            color: selectedCategory == category ? Colors.blue : Colors.grey,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            category,
+            style: TextStyle(
+              color: selectedCategory == category ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildImageWithTextAndBox(Map<String, String> item) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ConcertDetail(
+            imagePath: item['imagePath']!,
+            text1: item['text1']!,
+            text2: item['text2']!,
+            text3: item['text3']!,
+            text4: item['text4']!,
+          ),
+        ),
+      );
+    },
+    child: Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Color(int.parse(item['boxColor']!)),
+        borderRadius: BorderRadius.circular(10.0),
       ),
       child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.asset(
-                imagePath,
-                width: 110,
-                height: 140,
-                fit: BoxFit.cover,
-              ),
+          // ClipRRect to apply rounded corners to the image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+            child: Image.asset(
+              item['imagePath']!,
+              width: 100,
+              height: 140,
+              fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8.0),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    text1,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
+                Text(
+                  item['text1']!,
+                  style: TextStyle(
+                    color: Color(int.parse(item['textColor']!)),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
                 ),
-                SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(Icons.calendar_month_outlined, size: 16, color: Colors.green),
                     SizedBox(width: 4),
                     Text(
-                      text2,
+                      item['text2']!,
                       style: TextStyle(
-                        fontSize: 16,
-                        color: textColor,
+                        color: Color(int.parse(item['textColor']!)),
+                         fontSize: 16,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(Icons.timer_sharp, size: 16, color: Colors.blue),
                     SizedBox(width: 4),
                     Text(
-                      text3,
+                      item['text3']!,
                       style: TextStyle(
-                        fontSize: 16,
-                        color: textColor,
+                        color: Color(int.parse(item['textColor']!)),
+                         fontSize: 16,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
                     SizedBox(width: 4),
                     Text(
-                      text4,
+                      item['text4']!,
                       style: TextStyle(
-                        fontSize: 16,
-                        color: textColor,
+                        color: Color(int.parse(item['textColor']!)),
+                         fontSize: 16,
                       ),
                     ),
                   ],
