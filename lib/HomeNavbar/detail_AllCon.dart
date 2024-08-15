@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class Detailcon extends StatelessWidget {
-  const Detailcon({super.key});
+class DetailCon extends StatelessWidget {
+  const DetailCon ({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 171, 201, 255)
+      backgroundColor: Colors.purple[100]
       
     );
   }

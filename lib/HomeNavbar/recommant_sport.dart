@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project_new/HomeNavbar/detail_AllCon.dart';
+import 'package:project_new/HomeNavbar/detail_AllSportt.dart';
 
 class HomeConcertAndSport extends StatefulWidget {
   const HomeConcertAndSport({Key? key}) : super(key: key);
@@ -21,7 +21,7 @@ class _RecommendedHomeState extends State<HomeConcertAndSport> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "🏟⚽การแสดงและกีฬายอดนิยม",
+                "🏟⚽การกีฬายอดเยี่ยม",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 19,
@@ -30,7 +30,7 @@ class _RecommendedHomeState extends State<HomeConcertAndSport> {
               ),
               InkWell(
                 onTap: () {
-                   Navigator.push(context, MaterialPageRoute(builder: (context) => const Detailcon()),);
+                   Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailSport()),);
                 },
                 child: Text(
                   "ALL",

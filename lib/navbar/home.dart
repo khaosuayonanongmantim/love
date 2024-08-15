@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_new/HomeNavbar/Home_Sport.dart';
 import 'package:project_new/HomeNavbar/home_concert.dart';
-import 'package:project_new/HomeNavbar/home_nightclub.dart';
 import 'package:project_new/HomeNavbar/home_recommend.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -13,7 +12,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final PageController _controller = PageController(); // ประกาศตัวที่จุดเลื่อน
+  final PageController _controller = PageController(); // ตัวควบคุม PageView
 
   @override
   Widget build(BuildContext context) {
@@ -47,91 +46,34 @@ class _HomeState extends State<Home> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  InkWell(
+                  _buildImageWithLabel(
+                    imagePath: 'assets/con2.png',
+                    label: '𝐂𝐎𝐍𝐂𝐄𝐑𝐓',
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeConcert()), // หน้า Concert
+                        MaterialPageRoute(
+                          builder: (context) => HomeConcert(),
+                        ), // หน้า Concert
                       );
                     },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: Colors.greenAccent,
-                          width: 3,
-                        ),
-                      ),
-                      child: Text(
-                        "Concert",
-                        style: TextStyle(
-                          color: Colors.purpleAccent,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                   ),
-                  SizedBox(width: 10),
-                  InkWell(
+                  SizedBox(width: 70), // ระยะห่างระหว่างรูปภาพ
+                  _buildImageWithLabel(
+                    imagePath: 'assets/bell.jpg',
+                    label: '𝐒𝐏𝐎𝐑𝐓',
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeSport()), // หน้า Sport
+                        MaterialPageRoute(
+                          builder: (context) => HomeSport(),
+                        ), // หน้า Sport
                       );
                     },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: Colors.purpleAccent,
-                          width: 3,
-                        ),
-                      ),
-                      child: Text(
-                        "Sport",
-                        style: TextStyle(
-                          color: Colors.purpleAccent,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                   SizedBox(width: 10),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeNightclub()), // หน้า Sport
-                      );
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: Colors.blueAccent,
-                          width: 3,
-                        ),
-                      ),
-                      child: Text(
-                        "Nightclub",
-                        style: TextStyle(
-                          color: Colors.purpleAccent,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                   ),
                 ],
               ),
+              
               SizedBox(height: 30),
               Container(
                 height: 200,
@@ -236,10 +178,32 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+
+  // รูปวงกลม
+  Widget _buildImageWithLabel({
+    required String imagePath,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: CircleAvatar(
+            radius: 40, // ขนาดรูปภาพ
+            backgroundImage: AssetImage(imagePath),
+          ),
+        ),
+        SizedBox(height: 4), // Space between image and text
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.purple, // เปลี่ยนสีของข้อความ
+            fontSize: 18, // ปรับขนาดของข้อความ
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
 }
-
-// หน้า ConcertScreen ที่คุณต้องการนำไปแสดงเมื่อคลิกที่ Concert
-
-
-// หน้า SportScreen ที่คุณต้องการนำไปแสดงเมื่อคลิกที่ Sport
-

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project_new/HomeNavbar/detail_AllClup.dart';
-import 'package:project_new/HomeNavbar/home_conAndsport.dart';
+import 'package:project_new/HomeNavbar/detail_AllCon.dart';
+import 'package:project_new/HomeNavbar/recommant_sport.dart';
 
 class RecommendedHome extends StatefulWidget {
   const RecommendedHome({Key? key}) : super(key: key);
@@ -79,7 +79,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
           ),
         ),
 
-        // สถานที่บันเทิงยอดนิยม
+        // การแสดงยอดนิยม
         SizedBox(height: 30),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -87,7 +87,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "🌃 สถานที่บันเทิงยอดนิยม",
+                "🏟 การแสดงยอดนิยม",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 19,
@@ -96,7 +96,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailClub()),);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailCon()),);
                 },
                 child: Text(
                   "ALL",
@@ -125,7 +125,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
           ),
         ),
 
-        // การแสดงและกีฬายอดนิยม
+        // การกีฬายอดเยี่ยม
       HomeConcertAndSport(),
 
       
