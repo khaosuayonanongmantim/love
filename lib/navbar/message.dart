@@ -3,7 +3,6 @@ import 'dart:ui'; // Import for BackdropFilter
 
 import 'package:flutter/material.dart';
 import 'package:project_new/ReadMorePage.dart';
- 
 
 void main() {
   runApp(const MyApp());
@@ -133,7 +132,7 @@ class _MessageState extends State<Message> {
                     shadows: [
                       Shadow(
                         blurRadius: 10,
-                        offset: const Offset(2, 2),
+                        offset: Offset(2, 2),
                       ),
                     ],
                   ),
@@ -172,9 +171,9 @@ class _MessageState extends State<Message> {
                                   ),
                                 ),
                                 child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5), // Apply milder blur effect
+                                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2), // Apply a more noticeable blur effect
                                   child: Container(
-                                    color: Colors.black.withOpacity(0), // Transparent container to maintain blur
+                                    color: Colors.black.withOpacity(0.2), // Slightly darken the background
                                   ),
                                 ),
                               ),
@@ -190,7 +189,7 @@ class _MessageState extends State<Message> {
                                   'Heading for image $index',
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 20, // Increased font size for heading
+                                    fontSize: 22, // Increased font size for heading
                                     fontWeight: FontWeight.bold,
                                   ),
                                   overflow: TextOverflow.ellipsis, // Handle text overflow
@@ -208,9 +207,10 @@ class _MessageState extends State<Message> {
                                   'Message for image $index',
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),
+                                  textAlign: TextAlign.end,
                                   overflow: TextOverflow.ellipsis, // Handle text overflow
                                 ),
                               ),
@@ -253,18 +253,19 @@ class _MessageState extends State<Message> {
             ),
             // Cards section
             SizedBox(
-              height: 400, // Adjust the height of the GridView container as needed
+              height: 500, // Adjust the height of the GridView container
               child: GridView.builder(
                 padding: const EdgeInsets.all(16.0),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Two cards per row
+                  crossAxisCount: 1, // One card per row
                   crossAxisSpacing: 16.0,
                   mainAxisSpacing: 16.0,
+                  childAspectRatio: 2.5,
                 ),
                 itemCount: 4, // Number of cards
                 itemBuilder: (context, index) {
                   return Card(
-                    color: Color.fromARGB(255, 157, 171, 241), // Set the background color of the card
+                    color: const Color.fromARGB(255, 157, 171, 241), // Set the background color of the card
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -272,7 +273,7 @@ class _MessageState extends State<Message> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.card_giftcard,
                           size: 50,
                           color: Colors.blueAccent,
@@ -281,7 +282,7 @@ class _MessageState extends State<Message> {
                         Text(
                           'Card ${index + 1}',
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -305,7 +306,7 @@ class _MessageState extends State<Message> {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0), // Adjusted padding
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0), // Adjusted padding
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white, // Background color
@@ -324,7 +325,7 @@ class _MessageState extends State<Message> {
                     child: Text(
                       'ℝ𝔼𝔸𝔻 𝕄𝕆ℝ𝔼 >>',
                       style: const TextStyle(
-                        fontSize: 18, // Slightly larger font size
+                        fontSize: 20, // Slightly larger font size
                         color: Colors.blueAccent, // Color to match the border
                         fontWeight: FontWeight.bold,
                       ),
