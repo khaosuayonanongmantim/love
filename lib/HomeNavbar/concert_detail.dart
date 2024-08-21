@@ -21,7 +21,7 @@ class ConcertDetail extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(text1),
-        backgroundColor: Colors.green,
+        backgroundColor: const Color.fromARGB(255, 255, 135, 175),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

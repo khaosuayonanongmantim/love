@@ -19,13 +19,13 @@ class _HomeConcertState extends State<HomeConcert> {
   // Define the items for each category
   final Map<String, List<Map<String, String>>> categoryItems = {
     'All': [
-      {'imagePath': 'assets/bar.jpg', 'text1': 'Rock Concert', 'text2': '10 ตุลาคม 2567', 'text3': '9 PM', 'text4': 'Main Stage', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
-      {'imagePath': 'assets/bar1.jpg', 'text1': 'Jazz Night', 'text2': '12 กันยายน 2567', 'text3': '8 PM', 'text4': 'Side Stage', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
-      {'imagePath': 'assets/bar2.jpg', 'text1': 'Pop Fest', 'text2': '11 คุลาคม 2567', 'text3': '7 PM', 'text4': 'Main Stage', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
-      {'imagePath': 'assets/con3.jpg', 'text1': 'Trance Mania', 'text2': '4 กันยายน 2567', 'text3': '10 PM', 'text4': 'Main Arena', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
-      {'imagePath': 'assets/sport1.jpg', 'text1': 'Inter Mix', 'text2': '3 สิงหาคม 2567', 'text3': '6 PM', 'text4': 'Main Hall', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
-      {'imagePath': 'assets/nunew.jpg', 'text1': 'T-pop Gala', 'text2': '10 กันยายน 2567', 'text3': '5 PM', 'text4': 'Side Hall', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
-      {'imagePath': 'assets/hip.jpg', 'text1': 'Hip-Hop Jam', 'text2': '25 กันยายน 2567', 'text3': '9 PM', 'text4': 'Outdoor Stage', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
+      {'imagePath': 'assets/bar.jpg', 'text1': 'ʀᴏᴄᴋ ᴄᴏɴᴄᴇʀᴛ', 'text2': '10 ตุลาคม 2567', 'text3': '9 PM', 'text4': 'Main Stage', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
+      {'imagePath': 'assets/bar1.jpg', 'text1': 'ᴊᴀᴢᴢ ɴɪɢʜᴛ', 'text2': '12 กันยายน 2567', 'text3': '8 PM', 'text4': 'Side Stage', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
+      {'imagePath': 'assets/bar2.jpg', 'text1': 'ᴘᴏᴘ ꜰᴇꜱᴛ', 'text2': '11 คุลาคม 2567', 'text3': '7 PM', 'text4': 'Main Stage', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
+      {'imagePath': 'assets/con3.jpg', 'text1': 'ᴛʀᴀɴᴄᴇ ᴍᴀɴɪᴀ', 'text2': '4 กันยายน 2567', 'text3': '10 PM', 'text4': 'Main Arena', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
+      {'imagePath': 'assets/sport1.jpg', 'text1': 'ɪɴᴛᴇʀ ᴍɪx', 'text2': '3 สิงหาคม 2567', 'text3': '6 PM', 'text4': 'Main Hall', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
+      {'imagePath': 'assets/nunew.jpg', 'text1': 'ᴛ-ᴘᴏᴘ ɢᴀʟᴀ', 'text2': '10 กันยายน 2567', 'text3': '5 PM', 'text4': 'Side Hall', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
+      {'imagePath': 'assets/hip.jpg', 'text1': 'ʜɪᴘ-ʜᴏᴘ ᴊᴀᴍ', 'text2': '25 กันยายน 2567', 'text3': '9 PM', 'text4': 'Outdoor Stage', 'boxColor': '0xFFFFFFFF', 'textColor': '0xFF000000'},
       // Add more items as needed
     ],
     'Trance': [
@@ -97,8 +97,8 @@ class _HomeConcertState extends State<HomeConcert> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color.fromARGB(255, 45, 122, 58),
-                  Color.fromARGB(255, 37, 206, 22),
+                  Color.fromARGB(255, 243, 134, 219),
+                  Color.fromARGB(255, 241, 40, 151),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -168,7 +168,7 @@ class _HomeConcertState extends State<HomeConcert> {
                   // Content Box with Carousel
                   Container(
                     decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 186, 252, 202),
+                      color: Color.fromARGB(255, 252, 186, 232),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(40),
                         topRight: Radius.circular(40),
@@ -195,7 +195,7 @@ class _HomeConcertState extends State<HomeConcert> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         SmoothPageIndicator(
                           controller: _controller,
                           count: 10,
@@ -203,8 +203,8 @@ class _HomeConcertState extends State<HomeConcert> {
                             dotHeight: 10,
                             dotWidth: 10,
                             spacing: 16,
-                            activeDotColor: Colors.blue,
-                            dotColor: Colors.grey,
+                            activeDotColor: const Color.fromARGB(255, 243, 33, 191),
+                            dotColor: Colors.white,
                           ),
                         ),
 
@@ -212,12 +212,12 @@ class _HomeConcertState extends State<HomeConcert> {
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Row(
                             children: [
-                              SizedBox(height: 50),
+                              SizedBox(height: 70),
                               Text(
                                 'ʜɪɢʜʟɪɢʜᴛ',
                                 style: TextStyle(
                                   fontSize: 30,
-                                  color: Colors.green,
+                                  color: Colors.pink,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -239,7 +239,7 @@ class _HomeConcertState extends State<HomeConcert> {
                             ],
                           ),
                         ),
-
+                        SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Row(
@@ -249,7 +249,7 @@ class _HomeConcertState extends State<HomeConcert> {
                                 'ʀᴇʟᴀᴛᴇᴅ ᴛᴏᴘɪᴄᴇ',
                                 style: TextStyle(
                                   fontSize: 25,
-                                  color: Colors.green,
+                                  color: Colors.pink,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -311,7 +311,7 @@ class _HomeConcertState extends State<HomeConcert> {
             radius: 30,
             backgroundImage: AssetImage(imagePath),
             backgroundColor: selectedIndex == index
-                ? Colors.green
+                ? Colors.white
                 : Colors.transparent,
           ),
           SizedBox(height: 4),
@@ -325,7 +325,7 @@ class _HomeConcertState extends State<HomeConcert> {
                   right: 0,
                   child: Container(
                     height: 2,
-                    color: Color.fromARGB(255, 10, 128, 14),
+                    color: Colors.pink,
                   ),
                 ),
               // Text
@@ -333,7 +333,7 @@ class _HomeConcertState extends State<HomeConcert> {
                 text,
                 style: TextStyle(
                   color: selectedIndex == index
-                      ? const Color.fromARGB(255, 22, 102, 25)
+                      ? Colors.pink
                       : Colors.black,
                 ),
               ),
