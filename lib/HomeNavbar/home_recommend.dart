@@ -20,9 +20,9 @@ class _RecommendedHomeState extends State<RecommendedHome> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            "🔥 แนะนำสำหรับคุณ 🔥",
+            "🔥 ʀᴇᴄᴏᴍᴍᴇɴᴅᴇᴅ ꜰᴏʀ ʏᴏᴜ 🔥",
             style: TextStyle(
-              color: Colors.black,
+              color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
@@ -87,10 +87,10 @@ class _RecommendedHomeState extends State<RecommendedHome> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "🏟 การแสดงยอดนิยม",
+                "🏟 ᴘᴏᴘᴜʟᴀʀ ꜱʜᴏᴡꜱ",
                 style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 19,
+                  color: Colors.white,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -99,10 +99,10 @@ class _RecommendedHomeState extends State<RecommendedHome> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailCon()),);
                 },
                 child: Text(
-                  "ALL",
+                  "ᴀʟʟ",
                   style: TextStyle(
                     color: Colors.purple,
-                    fontSize: 20,
+                    fontSize: 25,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

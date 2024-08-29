@@ -21,10 +21,10 @@ class _RecommendedHomeState extends State<HomeConcertAndSport> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "🏟⚽การกีฬายอดเยี่ยม",
+                "🏟⚽ᴇxᴄᴇʟʟᴇɴᴛ ꜱᴘᴏʀᴛꜱ",
                 style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 19,
+                  color: Colors.white,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -33,10 +33,10 @@ class _RecommendedHomeState extends State<HomeConcertAndSport> {
                    Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailSport()),);
                 },
                 child: Text(
-                  "ALL",
+                  "ᴀʟʟ",
                   style: TextStyle(
-                    color: Color.fromARGB(255, 28, 142, 235),
-                    fontSize: 20,
+                    color: Colors.purple,
+                    fontSize: 25,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
