@@ -1,5 +1,6 @@
 import 'dart:async'; // Import dart:async for Timer
 import 'package:flutter/material.dart';
+import 'package:project_new/HomeNavbar/BuyTicket.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'concert_detail.dart'; // Import the ConcertDetail widget
 
@@ -246,7 +247,7 @@ class _HomeConcertState extends State<HomeConcert> {
                             children: [
                               SizedBox(height: 50),
                               Text(
-                                'ʀᴇʟᴀᴛᴇᴅ ᴛᴏᴘɪᴄᴇ',
+                                'ʀᴇʟᴀᴛᴇᴅ ᴛᴏᴘɪᴄ',
                                 style: TextStyle(
                                   fontSize: 25,
                                   color: Colors.pink,
@@ -504,6 +505,12 @@ class _HomeConcertState extends State<HomeConcert> {
                 // Add the 'Buy Tickets' button
                 ElevatedButton(
                   onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ConcertPlan(),
+                        ),
+                      );
+                    
                     // Action when the button is pressed
                     // You can navigate to another screen or show a dialog
                   },
