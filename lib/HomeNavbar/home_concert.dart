@@ -265,7 +265,7 @@ class _HomeConcertState extends State<HomeConcert> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 buildCircleAvatar('assets/con3.jpg', 'All', 0),
-                                buildCircleAvatar('assets/con.jpg', 'Trance', 1),
+                                buildCircleAvatar('assets/hip1.jpg', 'Trance', 1),
                                 buildCircleAvatar('assets/con1.png', 'Inter', 2),
                                 buildCircleAvatar('assets/con2.png', 'T-pop', 3),
                                 buildCircleAvatar('assets/hip.jpg', 'Hip-Hop', 4),

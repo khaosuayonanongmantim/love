@@ -65,21 +65,12 @@ class _ProductState extends State<Product> {
                     children: [
                       Column(
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(15.0),
-                            child: Image.asset(
-                              'assets/sale6.png',
-                              height: 30,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          const SizedBox(height: 9),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(15.0),
-                            child: Image.asset(
-                              'assets/sale5.png',
-                              height: 40,
-                              fit: BoxFit.cover,
+                          const Text(
+                            "ʙᴇꜱᴛ ᴘʀᴏᴅᴜᴄᴛꜱ",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 251, 64, 204),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
@@ -217,162 +208,327 @@ class _ProductState extends State<Product> {
     );
   }
 
-Widget _buildCategoryContent() {
-  List<Map<String, String>> items = [];
-  if (selectedCategory == 'ALL') {
-    items = [
-      {'image': 'assets/key2.jpg', 'title': 'Key Item 1', 'oldPrice': '\$50.00', 'newPrice': '\$40.00'},
-      {'image': 'assets/key3.jpg', 'title': 'Key Item 2', 'oldPrice': '\$45.00', 'newPrice': '\$35.00'},
-      {'image': 'assets/key4.jpg', 'title': 'Key Item 3', 'oldPrice': '\$40.00', 'newPrice': '\$30.00'},
-      {'image': 'assets/key5.jpg', 'title': 'Key Item 4', 'oldPrice': '\$30.00', 'newPrice': '\$20.00'},
-      {'image': 'assets/bts3.jpg', 'title': 'BTS Item 1', 'oldPrice': '\$35.00', 'newPrice': '\$25.00'},
-      {'image': 'assets/bts4.jpg', 'title': 'BTS Item 2', 'oldPrice': '\$45.00', 'newPrice': '\$35.00'},
-      {'image': 'assets/bts5.jpg', 'title': 'BTS Item 3', 'oldPrice': '\$55.00', 'newPrice': '\$45.00'},
-      {'image': 'assets/bts6.jpg', 'title': 'BTS Item 4', 'oldPrice': '\$65.00', 'newPrice': '\$55.00'},
-      {'image': 'assets/order1.jpg', 'title': 'Order Item 1', 'oldPrice': '\$70.00', 'newPrice': '\$60.00'},
-      {'image': 'assets/order2.jpg', 'title': 'Order Item 2', 'oldPrice': '\$80.00', 'newPrice': '\$70.00'},
-      {'image': 'assets/order3.jpg', 'title': 'Order Item 3', 'oldPrice': '\$90.00', 'newPrice': '\$80.00'},
-      {'image': 'assets/order5.jpg', 'title': 'Order Item 5', 'oldPrice': '\$80.00', 'newPrice': '\$70.00'},
-      {'image': 'assets/order6.jpg', 'title': 'Order Item 6', 'oldPrice': '\$70.00', 'newPrice': '\$60.00'},
-      {'image': 'assets/order7.jpg', 'title': 'Order Item 7', 'oldPrice': '\$50.00', 'newPrice': '\$40.00'},
-      {'image': 'assets/order8.jpg', 'title': 'Order Item 8', 'oldPrice': '\$80.00', 'newPrice': '\$50.00'},
-      {'image': 'assets/order9.jpg', 'title': 'Order Item 9', 'oldPrice': '\$80.00', 'newPrice': '\$60.00'},
-    ];
-  } else if (selectedCategory == 'KEY') {
-    items = [
-      {'image': 'assets/key2.jpg', 'title': 'Key Item 1', 'oldPrice': '\$50.00', 'newPrice': '\$40.00'},
-      {'image': 'assets/key3.jpg', 'title': 'Key Item 2', 'oldPrice': '\$45.00', 'newPrice': '\$35.00'},
-      {'image': 'assets/key4.jpg', 'title': 'Key Item 3', 'oldPrice': '\$40.00', 'newPrice': '\$30.00'},
-      {'image': 'assets/key5.jpg', 'title': 'Key Item 4', 'oldPrice': '\$30.00', 'newPrice': '\$20.00'},
-    ];
-  } else if (selectedCategory == 'SHIRT') {
-    items = [
-      {'image': 'assets/bts3.jpg', 'title': 'BTS Item 1', 'oldPrice': '\$35.00', 'newPrice': '\$25.00'},
-      {'image': 'assets/bts4.jpg', 'title': 'BTS Item 2', 'oldPrice': '\$45.00', 'newPrice': '\$35.00'},
-      {'image': 'assets/bts5.jpg', 'title': 'BTS Item 3', 'oldPrice': '\$55.00', 'newPrice': '\$45.00'},
-      {'image': 'assets/bts6.jpg', 'title': 'BTS Item 4', 'oldPrice': '\$65.00', 'newPrice': '\$55.00'},
-    ];
-  } else if (selectedCategory == 'ALBUM') {
-    items = [
-      {'image': 'assets/order1.jpg', 'title': 'Order Item 1', 'oldPrice': '\$70.00', 'newPrice': '\$60.00'},
-      {'image': 'assets/order2.jpg', 'title': 'Order Item 2', 'oldPrice': '\$80.00', 'newPrice': '\$70.00'},
-      {'image': 'assets/order3.jpg', 'title': 'Order Item 3', 'oldPrice': '\$90.00', 'newPrice': '\$80.00'},
-      {'image': 'assets/order5.jpg', 'title': 'Order Item 5', 'oldPrice': '\$80.00', 'newPrice': '\$70.00'},
-      {'image': 'assets/order6.jpg', 'title': 'Order Item 6', 'oldPrice': '\$70.00', 'newPrice': '\$60.00'},
-      {'image': 'assets/order7.jpg', 'title': 'Order Item 7', 'oldPrice': '\$50.00', 'newPrice': '\$40.00'},
-      {'image': 'assets/order8.jpg', 'title': 'Order Item 8', 'oldPrice': '\$80.00', 'newPrice': '\$50.00'},
-      {'image': 'assets/order9.jpg', 'title': 'Order Item 9', 'oldPrice': '\$80.00', 'newPrice': '\$60.00'},
-    ];
-  }
+  Widget _buildCategoryContent() {
+    List<Map<String, String>> items = [];
+    if (selectedCategory == 'ALL') {
+      items = [
+        {
+          'image': 'assets/key2.jpg',
+          'title': 'Key Item 1',
+          'oldPrice': '\$50.00',
+          'newPrice': '\$40.00'
+        },
+        {
+          'image': 'assets/key3.jpg',
+          'title': 'Key Item 2',
+          'oldPrice': '\$45.00',
+          'newPrice': '\$35.00'
+        },
+        {
+          'image': 'assets/key4.jpg',
+          'title': 'Key Item 3',
+          'oldPrice': '\$40.00',
+          'newPrice': '\$30.00'
+        },
+        {
+          'image': 'assets/key5.jpg',
+          'title': 'Key Item 4',
+          'oldPrice': '\$30.00',
+          'newPrice': '\$20.00'
+        },
+        {
+          'image': 'assets/bts3.jpg',
+          'title': 'BTS Item 1',
+          'oldPrice': '\$35.00',
+          'newPrice': '\$25.00'
+        },
+        {
+          'image': 'assets/bts4.jpg',
+          'title': 'BTS Item 2',
+          'oldPrice': '\$45.00',
+          'newPrice': '\$35.00'
+        },
+        {
+          'image': 'assets/bts5.jpg',
+          'title': 'BTS Item 3',
+          'oldPrice': '\$55.00',
+          'newPrice': '\$45.00'
+        },
+        {
+          'image': 'assets/bts6.jpg',
+          'title': 'BTS Item 4',
+          'oldPrice': '\$65.00',
+          'newPrice': '\$55.00'
+        },
+        {
+          'image': 'assets/order1.jpg',
+          'title': 'Order Item 1',
+          'oldPrice': '\$70.00',
+          'newPrice': '\$60.00'
+        },
+        {
+          'image': 'assets/order2.jpg',
+          'title': 'Order Item 2',
+          'oldPrice': '\$80.00',
+          'newPrice': '\$70.00'
+        },
+        {
+          'image': 'assets/order3.jpg',
+          'title': 'Order Item 3',
+          'oldPrice': '\$90.00',
+          'newPrice': '\$80.00'
+        },
+        {
+          'image': 'assets/order5.jpg',
+          'title': 'Order Item 5',
+          'oldPrice': '\$80.00',
+          'newPrice': '\$70.00'
+        },
+        {
+          'image': 'assets/order6.jpg',
+          'title': 'Order Item 6',
+          'oldPrice': '\$70.00',
+          'newPrice': '\$60.00'
+        },
+        {
+          'image': 'assets/order7.jpg',
+          'title': 'Order Item 7',
+          'oldPrice': '\$50.00',
+          'newPrice': '\$40.00'
+        },
+        {
+          'image': 'assets/order8.jpg',
+          'title': 'Order Item 8',
+          'oldPrice': '\$80.00',
+          'newPrice': '\$50.00'
+        },
+        {
+          'image': 'assets/order9.jpg',
+          'title': 'Order Item 9',
+          'oldPrice': '\$80.00',
+          'newPrice': '\$60.00'
+        },
+      ];
+    } else if (selectedCategory == 'KEY') {
+      items = [
+        {
+          'image': 'assets/key2.jpg',
+          'title': 'Key Item 1',
+          'oldPrice': '\$50.00',
+          'newPrice': '\$40.00'
+        },
+        {
+          'image': 'assets/key3.jpg',
+          'title': 'Key Item 2',
+          'oldPrice': '\$45.00',
+          'newPrice': '\$35.00'
+        },
+        {
+          'image': 'assets/key4.jpg',
+          'title': 'Key Item 3',
+          'oldPrice': '\$40.00',
+          'newPrice': '\$30.00'
+        },
+        {
+          'image': 'assets/key5.jpg',
+          'title': 'Key Item 4',
+          'oldPrice': '\$30.00',
+          'newPrice': '\$20.00'
+        },
+      ];
+    } else if (selectedCategory == 'SHIRT') {
+      items = [
+        {
+          'image': 'assets/bts3.jpg',
+          'title': 'BTS Item 1',
+          'oldPrice': '\$35.00',
+          'newPrice': '\$25.00'
+        },
+        {
+          'image': 'assets/bts4.jpg',
+          'title': 'BTS Item 2',
+          'oldPrice': '\$45.00',
+          'newPrice': '\$35.00'
+        },
+        {
+          'image': 'assets/bts5.jpg',
+          'title': 'BTS Item 3',
+          'oldPrice': '\$55.00',
+          'newPrice': '\$45.00'
+        },
+        {
+          'image': 'assets/bts6.jpg',
+          'title': 'BTS Item 4',
+          'oldPrice': '\$65.00',
+          'newPrice': '\$55.00'
+        },
+      ];
+    } else if (selectedCategory == 'ALBUM') {
+      items = [
+        {
+          'image': 'assets/order1.jpg',
+          'title': 'Order Item 1',
+          'oldPrice': '\$70.00',
+          'newPrice': '\$60.00'
+        },
+        {
+          'image': 'assets/order2.jpg',
+          'title': 'Order Item 2',
+          'oldPrice': '\$80.00',
+          'newPrice': '\$70.00'
+        },
+        {
+          'image': 'assets/order3.jpg',
+          'title': 'Order Item 3',
+          'oldPrice': '\$90.00',
+          'newPrice': '\$80.00'
+        },
+        {
+          'image': 'assets/order5.jpg',
+          'title': 'Order Item 5',
+          'oldPrice': '\$80.00',
+          'newPrice': '\$70.00'
+        },
+        {
+          'image': 'assets/order6.jpg',
+          'title': 'Order Item 6',
+          'oldPrice': '\$70.00',
+          'newPrice': '\$60.00'
+        },
+        {
+          'image': 'assets/order7.jpg',
+          'title': 'Order Item 7',
+          'oldPrice': '\$50.00',
+          'newPrice': '\$40.00'
+        },
+        {
+          'image': 'assets/order8.jpg',
+          'title': 'Order Item 8',
+          'oldPrice': '\$80.00',
+          'newPrice': '\$50.00'
+        },
+        {
+          'image': 'assets/order9.jpg',
+          'title': 'Order Item 9',
+          'oldPrice': '\$80.00',
+          'newPrice': '\$60.00'
+        },
+      ];
+    }
 
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (selectedCategory == 'ALL') ...[
-          Text(
-            'ꜱᴘᴇᴄɪᴀʟ ꜰᴏʀ ʏᴏᴜ',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ],
-        GridView.builder(
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16.0,
-            mainAxisSpacing: 16.0,
-          ),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-             final isFavorite = _favorites[index] ?? false;
-
-            return Container(
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 245, 214, 238),
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: Colors.white, width: 2),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (selectedCategory == 'ALL') ...[
+            Text(
+              'ꜱᴘᴇᴄɪᴀʟ ꜰᴏʀ ʏᴏᴜ',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.asset(
-                      items[index]['image']!,
-                      height: 85,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+            ),
+          ],
+          GridView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+            ),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final isFavorite = _favorites[index] ?? false;
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 245, 214, 238),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.asset(
+                        items[index]['image']!,
+                        height: 85,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          items[index]['title']!,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                        Row(
-                          children: [
-                            Text.rich(
-                              TextSpan(
-                                text: items[index]['oldPrice']!,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey, // ขีดทิ้งเป็นสีเทา
-                                  decoration: TextDecoration.lineThrough,
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text: ' ${items[index]['newPrice']}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold, // ราคาใหม่เป็นสีแดง
-                                      decoration: TextDecoration.none, // ไม่มีขีดทิ้ง
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              textAlign: TextAlign.left,
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            items[index]['title']!,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
                             ),
-                           Spacer(),
+                            textAlign: TextAlign.left,
+                          ),
+                          Row(
+                            children: [
+                              Text.rich(
+                                TextSpan(
+                                  text: items[index]['oldPrice']!,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey, // ขีดทิ้งเป็นสีเทา
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: ' ${items[index]['newPrice']}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.red,
+                                        fontWeight: FontWeight
+                                            .bold, // ราคาใหม่เป็นสีแดง
+                                        decoration:
+                                            TextDecoration.none, // ไม่มีขีดทิ้ง
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                              Spacer(),
                               IconButton(
                                 icon: Icon(
-                                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                                  isFavorite
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
                                   color: isFavorite ? Colors.red : Colors.grey,
                                 ),
-                                 onPressed: () {
+                                onPressed: () {
                                   setState(() {
-                                    _favorites[index] = !isFavorite; // Toggle favorite status
+                                    _favorites[index] =
+                                        !isFavorite; // Toggle favorite status
                                   });
-                                  },
+                                },
                               ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  );
-}
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
