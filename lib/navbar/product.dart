@@ -11,16 +11,18 @@ class Product extends StatefulWidget {
 class _ProductState extends State<Product> {
   late ScrollController _scrollController;
   late Timer _timer;
-  int _currentIndex = 0;
+    int _currentIndex = 0;
   String selectedCategory = 'ALL'; // Default category
+  String selectedType = 'CONCERT'; // Default type (CONCERT or SPORT)
   Map<int, bool> _favorites = {}; // New Map to track favorite items
 
-  @override
+
+    @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
 
-    // Auto-scroll logic
+
     _timer = Timer.periodic(Duration(seconds: 2), (timer) {
       if (_currentIndex < 2) {
         _currentIndex++;
@@ -58,7 +60,7 @@ class _ProductState extends State<Product> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
+    Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,7 +89,7 @@ class _ProductState extends State<Product> {
                     ],
                   ),
                 ),
-                Padding(
+                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 16.0),
                   child: Container(
@@ -111,8 +113,7 @@ class _ProductState extends State<Product> {
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 10),
+const SizedBox(height: 10),
                 SizedBox(
                   height: 200,
                   child: ListView(
@@ -125,17 +126,24 @@ class _ProductState extends State<Product> {
                     ],
                   ),
                 ),
-                // Circular images with text for categories
+                SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildTypeButton('CONCERT', const Color.fromARGB(255, 243, 33, 163)),
+                    SizedBox(width: 40),
+                    _buildTypeButton('SPORT', const Color.fromARGB(255, 76, 127, 175)),
+                  ],
+                ),
+
+                // Circular images with text for categories based on selected type
                 Padding(
                   padding: const EdgeInsets.all(18.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildCircularImageWithText('assets/shop.png', 'ALL'),
-                      _buildCircularImageWithText('assets/key5.jpg', 'KEY'),
-                      _buildCircularImageWithText('assets/bts6.jpg', 'SHIRT'),
-                      _buildCircularImageWithText('assets/order9.jpg', 'ALBUM'),
-                    ],
+                    children: selectedType == 'CONCERT'
+                        ? _buildConcertCategories()
+                        : _buildSportCategories(),
                   ),
                 ),
                 _buildCategoryContent(),
@@ -147,7 +155,7 @@ class _ProductState extends State<Product> {
     );
   }
 
-  Widget _buildFeaturedProduct(String imagePath) {
+    Widget _buildFeaturedProduct(String imagePath) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Container(
@@ -172,8 +180,7 @@ class _ProductState extends State<Product> {
                   imagePath,
                   fit: BoxFit.cover,
                 ),
-              ),
-              // Add a border or overlay here if desired
+              ), 
             ],
           ),
         ),
@@ -181,7 +188,51 @@ class _ProductState extends State<Product> {
     );
   }
 
-  // Circular images with clickable categories
+
+  Widget _buildTypeButton(String type, Color color) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedType = type;
+          selectedCategory = 'ALL';
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          type,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildConcertCategories() {
+    return [
+      _buildCircularImageWithText('assets/shop.png', 'ALL'),
+      _buildCircularImageWithText('assets/key5.jpg', 'KEY'),
+      _buildCircularImageWithText('assets/bts6.jpg', 'SHIRT'),
+      _buildCircularImageWithText('assets/order9.jpg', 'ALBUM'),
+    ];
+  }
+
+  List<Widget> _buildSportCategories() {
+    return [
+      _buildCircularImageWithText('assets/sport1.jpg', 'ALL'),
+      _buildCircularImageWithText('assets/sport2.jpg', 'SHOES'),
+      _buildCircularImageWithText('assets/sport3.jpg', 'JERSEY'),
+      _buildCircularImageWithText('assets/sports4.jpg', 'GEAR'),
+    ];
+  }
+
   Widget _buildCircularImageWithText(String imagePath, String category) {
     return GestureDetector(
       onTap: () {
@@ -210,7 +261,8 @@ class _ProductState extends State<Product> {
 
   Widget _buildCategoryContent() {
     List<Map<String, String>> items = [];
-    if (selectedCategory == 'ALL') {
+    if (selectedType == 'CONCERT') {
+       if (selectedCategory == 'ALL') {
       items = [
         {
           'image': 'assets/key2.jpg',
@@ -414,23 +466,58 @@ class _ProductState extends State<Product> {
           'newPrice': '\$60.00'
         },
       ];
+      }
+      // Add other categories for CONCERT if needed
+    } else if (selectedType == 'SPORT') {
+       if (selectedCategory == 'ALL') {
+      items = [
+        {
+          'image': 'assets/key2.jpg',
+          'title': 'Key Item 1',
+          'oldPrice': '\$50.00',
+          'newPrice': '\$40.00'
+        },
+      ];
+    } else if (selectedCategory == 'SHOES') {
+      items = [
+        {
+          'image': 'assets/key2.jpg',
+          'title': 'Key Item 1',
+          'oldPrice': '\$50.00',
+          'newPrice': '\$40.00'
+        },
+        {
+          'image': 'assets/key3.jpg',
+          'title': 'Key Item 2',
+          'oldPrice': '\$45.00',
+          'newPrice': '\$35.00'
+        },
+      ];
+    } else if (selectedCategory == 'JERSEY') {
+      items = [
+        {
+          'image': 'assets/bts3.jpg',
+          'title': 'BTS Item 1',
+          'oldPrice': '\$35.00',
+          'newPrice': '\$25.00'
+        },
+      ];
+    } else if (selectedCategory == 'GEAR') {
+      items = [
+        {
+          'image': 'assets/order1.jpg',
+          'title': 'Order Item 1',
+          'oldPrice': '\$70.00',
+          'newPrice': '\$60.00'
+        },
+      ];
+    }
     }
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (selectedCategory == 'ALL') ...[
-            Text(
-              'ꜱᴘᴇᴄɪᴀʟ ꜰᴏʀ ʏᴏᴜ',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
           GridView.builder(
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -531,4 +618,4 @@ class _ProductState extends State<Product> {
       ),
     );
   }
-}
+} 

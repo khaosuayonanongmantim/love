@@ -36,7 +36,7 @@ class _HomeState extends State<Home> {
                   "THE CONCERT",
                   style: TextStyle(
                     color: Colors.purpleAccent,
-                    fontSize: 30,
+                    fontSize: 35,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -45,7 +45,7 @@ class _HomeState extends State<Home> {
                   "MUSIC FESTIVAL",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

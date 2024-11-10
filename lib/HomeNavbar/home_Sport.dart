@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeSport extends StatefulWidget {
   const HomeSport({super.key});
@@ -9,11 +8,13 @@ class HomeSport extends StatefulWidget {
 }
 
 class _HomeSportState extends State<HomeSport> {
+  bool _isHovered = false;
+
   final PageController _controller = PageController();
-  String selectedCategory = 'All';
+  String selectedCategory = 'ทั้งหมด';
 
   final Map<String, List<Map<String, String>>> categoryItems = {
-    'All': [
+    'ทั้งหมด': [
       {
         'imagePath': 'assets/bar.jpg',
         'text1': 'ʀᴏᴄᴋ ᴄᴏɴᴄᴇʀᴛ',
@@ -77,10 +78,8 @@ class _HomeSportState extends State<HomeSport> {
         'boxColor': '0xFFFFFFFF',
         'textColor': '0xFF000000'
       },
-      // Add more items as needed
     ],
-    // Add more categories and items as needed
-    'Trance': [
+    'BOXING': [
       {
         'imagePath': 'assets/con3.jpg',
         'text1': 'Trance Mania',
@@ -92,7 +91,7 @@ class _HomeSportState extends State<HomeSport> {
       },
       // Add more items as needed
     ],
-    'Inter': [
+    'FOOTBALL': [
       {
         'imagePath': 'assets/sport1.jpg',
         'text1': 'Inter Mix',
@@ -104,7 +103,7 @@ class _HomeSportState extends State<HomeSport> {
       },
       // Add more items as needed
     ],
-    'T-pop': [
+    'OTHER': [
       {
         'imagePath': 'assets/nunew.jpg',
         'text1': 'T-pop Gala',
@@ -116,35 +115,11 @@ class _HomeSportState extends State<HomeSport> {
       },
       // Add more items as needed
     ],
-    'Hip-Hop': [
-      {
-        'imagePath': 'assets/hip.jpg',
-        'text1': 'Hip-Hop Jam',
-        'text2': '25 กันยายน 2567',
-        'text3': '9 PM',
-        'text4': 'Outdoor Stage',
-        'boxColor': '0xFFEEEEEE',
-        'textColor': '0xFF000000'
-      },
-      // Add more items as needed
-    ]
   };
-
-  final List<String> _imagePaths = [
-    'assets/sport6.jpg',
-    'assets/sport5.jpg',
-    'assets/sport3.jpg',
-    'assets/sport.jpg',
-    'assets/sport2.jpg',
-    'assets/sport1.jpg',
-  ];
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _controller.jumpToPage(_imagePaths.length); // Start at the middle page
-    });
   }
 
   @override
@@ -164,8 +139,8 @@ class _HomeSportState extends State<HomeSport> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFFFFC0CB),
-                  Color(0xFFB39DDB),
+                  Color.fromARGB(255, 238, 163, 192),
+                  Color(0xFFEF629F),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -230,54 +205,45 @@ class _HomeSportState extends State<HomeSport> {
                   const SizedBox(height: 20),
                   Container(
                     decoration: BoxDecoration(
-                      color: Color(0xFFFFE0F0),
+                      color: Color.fromARGB(255, 252, 186, 232),
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: Column(
                       children: [
-                        Container(
-                          height: 200, // Increase the height for a larger image
-                          child: PageView.builder(
-                            controller: _controller,
-                            itemCount: _imagePaths.length * 3,
-                            itemBuilder: (context, index) {
-                              // To create a looping effect
-                              final actualIndex = index % _imagePaths.length;
-                              return buildCarouselItem(
-                                  _imagePaths[actualIndex]);
-                            },
-                            onPageChanged: (index) {
-                              if (index == 0) {
-                                _controller.jumpToPage(_imagePaths.length);
-                              } else if (index == _imagePaths.length * 2 - 1) {
-                                _controller.jumpToPage(_imagePaths.length - 1);
-                              }
-                            },
-                          ),
+                        SizedBox(
+                            height: 20), // เพิ่มช่องว่างระหว่างข้อความกับรูปภาพ
+                        Image.asset(
+                          'assets/sport.gif', // เปลี่ยนเป็นชื่อไฟล์ภาพที่คุณต้องการแสดง
+                          width: 370, // กำหนดความกว้างของรูปภาพ
+                          height: 200, // กำหนดความสูงของรูปภาพ
+                          fit: BoxFit.cover, // ปรับขนาดรูปภาพให้พอดี
                         ),
-                        SizedBox(height: 20),
-                        SmoothPageIndicator(
-                          controller: _controller,
-                          count: _imagePaths.length,
-                          effect: ExpandingDotsEffect(
-                            activeDotColor: Colors.pinkAccent,
-                            dotColor: Colors.grey,
-                            dotHeight: 8,
-                            dotWidth: 8,
-                            spacing: 16,
-                          ),
-                        ),
+
+                        //ประเภทการแข่งขัน
+                        const SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(height: 70),
                               Text(
-                                'ʜɪɢʜʟɪɢʜᴛ',
+                                'ประเภทการแข่งขันกีฬา',
                                 style: TextStyle(
-                                  fontSize: 30,
+                                  fontSize: 20,
                                   color: Colors.pink,
                                   fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 5.0), // เพิ่มช่องว่างเล็กน้อย
+                                child: Text(
+                                  'ᴛʜᴇ ᴛʀᴏᴘʜʏ ɪꜱ ɪɴ ꜰʀᴏɴᴛ ᴏꜰ ʏᴏᴜ.  ɪꜱ ɪɴ ʏᴏᴜʀ ʜᴇᴀʀᴛ.\n',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    fontStyle: FontStyle.italic,
+                                  ),
                                 ),
                               ),
                             ],
@@ -288,36 +254,94 @@ class _HomeSportState extends State<HomeSport> {
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
-                              buildImageWithText('assets/bar4.jpg'),
-                              buildImageWithText('assets/bar2.jpg'),
-                              buildImageWithText('assets/heap.jpg'),
-                              buildImageWithText('assets/bar3.jpg'),
-                              buildImageWithText('assets/party.jpg'),
-                              buildImageWithText('assets/bar.jpg'),
-                              buildImageWithText('assets/heap.jpg'),
+                              buildImageWithText('assets/bat.jpg', 'แบตมินตัน'),
+                              buildImageWithText(
+                                  'assets/bas.jpg', 'บาสเก็ตบอล'),
+                              buildImageWithText('assets/ball.jpg', 'ฟุตบอล'),
+                              buildImageWithText(
+                                  'assets/val.jpg', 'วอลเลย์บอล'),
+                              buildImageWithText('assets/pig.jpg', 'ปิงปอง'),
                             ],
                           ),
                         ),
-                        SizedBox(height: 20),
+
+                        //การแข่งขันกีฬา
+                        const SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(height: 50),
                               Text(
-                                'ʀᴇʟᴀᴛᴇᴅ ᴛᴏᴘɪᴄᴇ',
+                                'การแข่งขันกีฬากับผู้ต่อสู้',
                                 style: TextStyle(
-                                  fontSize: 25,
+                                  fontSize: 20,
                                   color: Colors.pink,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                              const SizedBox(height: 20),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isHovered = !_isHovered;
+                                  });
+                                },
+                                child: MouseRegion(
+                                  onEnter: (_) =>
+                                      setState(() => _isHovered = true),
+                                  onExit: (_) =>
+                                      setState(() => _isHovered = false),
+                                  child: AnimatedSwitcher(
+                                    duration: Duration(milliseconds: 300),
+                                    child: _isHovered
+                                        ? Image.asset(
+                                            'assets/sports1.jpg', // รูปที่สองจะแสดงเมื่อวางเมาส์/แตะ
+                                            key: ValueKey('sports1'),
+                                            width: 400,
+                                            height: 200,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.asset(
+                                            'assets/sports.jpg', // รูปภาพเริ่มต้น
+                                            key: ValueKey('sports'),
+                                            width: 400,
+                                            height: 200,
+                                            fit: BoxFit.cover,
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                  height:
+                                      10), // ช่องว่างระหว่างรูปภาพหลักและรูปภาพด้านล่าง
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  buildSmallImage(
+                                      'assets/sports3.webp'), // รูปแรก
+                                  buildSmallImage(
+                                      'assets/sports4.jpg'), // รูปที่สอง
+                                ],
+                              ),
+                              SizedBox(height: 10), // ช่องว่างระหว่างแถวรูปภาพ
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  buildSmallImage(
+                                      'assets/sports5.jpg'), // รูปที่สาม
+                                  buildSmallImage(
+                                      'assets/sports2.jpg'), // รูปที่สี่
+                                ],
+                              ),
                             ],
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 30),
                         Container(
-                          height: 50,
+                          height: 35, // ความสูง
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: ListView(
                             scrollDirection: Axis.horizontal,
@@ -330,9 +354,10 @@ class _HomeSportState extends State<HomeSport> {
                                 },
                                 child: Container(
                                   margin: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
+                                      horizontal: 5.0),
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0),
+                                      horizontal: 8.0, vertical: 5.0),
+                                  width: 100, // ปรับความกว้างของแต่ละหมวดหมู่
                                   decoration: BoxDecoration(
                                     color: selectedCategory == category
                                         ? Colors.pinkAccent
@@ -353,7 +378,7 @@ class _HomeSportState extends State<HomeSport> {
                                         color: selectedCategory == category
                                             ? Colors.white
                                             : Colors.black,
-                                        fontSize: 16,
+                                        fontSize: 18,
                                       ),
                                     ),
                                   ),
@@ -362,7 +387,7 @@ class _HomeSportState extends State<HomeSport> {
                             }).toList(),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         // Concert List
                         Column(
                           children: categoryItems[selectedCategory]
@@ -375,7 +400,7 @@ class _HomeSportState extends State<HomeSport> {
                                     borderRadius: BorderRadius.circular(15.0),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black26,
+                                        color: const Color.fromARGB(66, 236, 9, 9),
                                         blurRadius: 4,
                                         offset: Offset(0, 2),
                                       ),
@@ -394,7 +419,7 @@ class _HomeSportState extends State<HomeSport> {
                                           children: [
                                             Container(
                                               width: 120,
-                                              height: 150,
+                                              height: 170,
                                               decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(10),
@@ -412,7 +437,9 @@ class _HomeSportState extends State<HomeSport> {
                                                 ],
                                               ),
                                             ),
-                                            SizedBox(width: 16.0,),
+                                            SizedBox(
+                                              width: 16.0,
+                                            ),
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment:
@@ -430,52 +457,117 @@ class _HomeSportState extends State<HomeSport> {
                                                     ),
                                                   ),
                                                   SizedBox(height: 8.0),
-                                                  Text(
-                                                    item['text2']!,
-                                                    style: TextStyle(
-                                                      color: Color(int.parse(
-                                                          item['textColor']!)),
-                                                      fontSize:
-                                                          16, // Adjust font size
-                                                    ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons
+                                                            .calendar_today, // หรือใช้ไอคอนที่คุณต้องการ
+                                                        color: Colors
+                                                            .green, // เปลี่ยนสีของไอคอนเป็นสีเขียว
+                                                        size:
+                                                            20, // ปรับขนาดไอคอนตามต้องการ
+                                                      ),// เพิ่มระยะห่างระหว่างไอคอนและข้อความ
+                                                      Text(
+                                                        item['text2']!,
+                                                        style: TextStyle(
+                                                          color: Color(
+                                                              int.parse(item[
+                                                                  'textColor']!)),
+                                                          fontSize:
+                                                              16, // ปรับขนาดฟอนต์
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                   SizedBox(height: 4.0),
-                                                  Text(
-                                                    '${item['text3']} at ${item['text4']}',
-                                                    style: TextStyle(
-                                                      color: Color(int.parse(
-                                                          item['textColor']!)),
-                                                      fontSize:
-                                                          14, // Adjust font size
-                                                    ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start, // ให้จัดชิดซ้าย
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .access_time, // ไอคอนนาฬิกา
+                                                            color: Colors
+                                                                .blue, // สีฟ้า
+                                                            size:
+                                                                16, // ขนาดของไอคอน
+                                                          ),
+                                                          SizedBox(
+                                                              width:
+                                                                  4), // ระยะห่างระหว่างไอคอนกับข้อความ
+                                                          Text(
+                                                            item['text3']!,
+                                                            style: TextStyle(
+                                                              color: Color(int
+                                                                  .parse(item[
+                                                                      'textColor']!)),
+                                                              fontSize:
+                                                                  14, // ขนาดฟอนต์
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .push_pin, // ไอคอนปักหมุด
+                                                            color: Color.fromARGB(255, 236, 20, 4), // สีแดง
+                                                            size:
+                                                                16, // ขนาดของไอคอน
+                                                          ),
+                                                          SizedBox(
+                                                              width:
+                                                                  4), // ระยะห่างระหว่างไอคอนกับข้อความ
+                                                          Text(
+                                                            item['text4']!,
+                                                            style: TextStyle(
+                                                              color: Color(int
+                                                                  .parse(item[
+                                                                      'textColor']!)),
+                                                              fontSize:
+                                                                  14, // ขนาดฟอนต์
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
                                                   ),
                                                   Container(
-                                        padding: const EdgeInsets.all(10.0),
-                                        alignment: Alignment.centerLeft,
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            // Add your ticket purchasing logic here
-                                          },
-                                          child: Text('Buy Tickets'),
-                                          style: ElevatedButton.styleFrom(
-                                            primary: Colors
-                                                .pinkAccent, // Button color
-                                            onPrimary:
-                                                Colors.white, // Text color
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20.0),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
+                                                        // Add your ticket purchasing logic here
+                                                      },
+                                                      child: Text('ซื้อบัตร'),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        primary: const Color.fromARGB(255, 241, 30, 14), // Button color
+                                                        onPrimary: Colors
+                                                            .white, // Text color
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      20.0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
-                                      
                                     ],
                                   ),
                                 );
@@ -493,28 +585,59 @@ class _HomeSportState extends State<HomeSport> {
       ),
     );
   }
-     Widget buildImageWithText(String imagePath) {
+
+  Widget buildImageWithText(String imagePath, String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Container(
-        width: 150,
+        width: 200,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
+              color: Color.fromARGB(255, 255, 75, 180).withOpacity(0.5),
               spreadRadius: 2,
               blurRadius: 5,
               offset: Offset(0, 3),
             ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.cover,
-          ),
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                width: 200,
+                height: 170, // Adjust height as needed
+              ),
+            ),
+            Positioned(
+              bottom: 10, // Adjust position as needed
+              left: 10,
+              right: 10,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black
+                      .withOpacity(0.6), // Semi-transparent background
+                  borderRadius: BorderRadius.circular(10), // Rounded corners
+                ),
+                child: Center(
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -536,6 +659,31 @@ class _HomeSportState extends State<HomeSport> {
             offset: Offset(0, 4),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buildSmallImage(String imagePath) {
+    return Container(
+      width: 180, // ความกว้างของรูปภาพเล็ก
+      height: 100, // ความสูงของรูปภาพเล็ก
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.asset(
+          imagePath,
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
