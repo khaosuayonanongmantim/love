@@ -11,7 +11,7 @@ class ZoneALPage extends StatefulWidget {
 class _ZoneALPageState extends State<ZoneALPage> {
   Set<int> selectedSeats = Set();
   Set<int> bookedSeats = Set(); // Set to keep track of booked seats
-  static const double seatPrice = 4000.0;
+  static const double seatPrice = 5000.0;
 
   @override
   Widget build(BuildContext context) {
@@ -251,8 +251,8 @@ class _ZoneALPageState extends State<ZoneALPage> {
                                               totalAmount: totalAmount.toStringAsFixed(2),
                                               onBookingComplete: () {
                                                 setState(() {
-                                                  bookedSeats.addAll(selectedSeats);
-                                                  selectedSeats.clear();
+                                                  bookedSeats.addAll(selectedSeats); // Mark seats as booked
+                                                  selectedSeats.clear(); // Clear selected seats
                                                 });
                                               },
                                             ),
@@ -299,71 +299,136 @@ class PaymentPage extends StatelessWidget {
   final VoidCallback onBookingComplete;
 
   const PaymentPage({
-    super.key,
     required this.seatNumbers,
     required this.totalAmount,
     required this.onBookingComplete,
-  });
+    Key? key,
+  }) : super(key: key);
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ชำระเงิน'),
-        backgroundColor: Colors.deepPurple, // Updated color
+        title: const Text('Payment Details'),
+        backgroundColor: const Color.fromARGB(255, 102, 51, 153), // Updated AppBar color
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              'คุณกำลังจองที่นั่ง: $seatNumbers',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
+            Container(
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10.0,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'ยอดรวม: ฿$totalAmount',
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
+              child: Column(
+                children: [
+                  const Text(
+                    'Booking Summary',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Seats:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      Text(
+                        seatNumbers,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total Price:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      Text(
+                        '฿$totalAmount',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: () {
+                      onBookingComplete(); // Mark seats as booked
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaymentPage1(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.deepPurple,
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: const Text(
+                      'Complete Payment',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PaymentPage1(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.deepPurple,
-                onPrimary: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                elevation: 5,
-              ),
-              child: const Text(
-                'ดำเนินการชำระเงิน',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+            const Text(
+              'Thank you for booking with us!',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: Colors.black45,
               ),
             ),
           ],
         ),
       ),
+      backgroundColor: const Color.fromARGB(255, 240, 248, 255), // Light background color for better contrast
     );
   }
 }

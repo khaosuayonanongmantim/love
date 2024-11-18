@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:project_new/Payment/PaymentPage1.dart'; // Import PaymentPage1
 
-class ZoneCLPage extends StatefulWidget {
-  const ZoneCLPage({super.key});
+class ZoneBRPage extends StatefulWidget {
+  const ZoneBRPage({super.key});
 
   @override
-  State<ZoneCLPage> createState() => _ZoneCLPageState();
+  State<ZoneBRPage> createState() => _ZoneBRPageState();
 }
 
-class _ZoneCLPageState extends State<ZoneCLPage> {
+class _ZoneBRPageState extends State<ZoneBRPage> {
   Set<int> selectedSeats = Set();
   Set<int> bookedSeats = Set(); // Set to keep track of booked seats
-  static const double seatPrice = 4500.0;
+  static const double seatPrice = 6000.0;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class _ZoneCLPageState extends State<ZoneCLPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('เลือกที่นั่งในโซน CL'),
+        title: const Text('เลือกที่นั่งในโซน BR'),
         backgroundColor: const Color.fromARGB(255, 102, 51, 153), // Updated color
       ),
       body: Padding(
@@ -106,7 +106,7 @@ class _ZoneCLPageState extends State<ZoneCLPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'เลือกที่นั่งในโซน CL',
+                    'เลือกที่นั่งในโซน BR',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,

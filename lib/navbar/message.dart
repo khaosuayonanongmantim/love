@@ -1,360 +1,452 @@
-import 'dart:async'; // Import the Timer class
-import 'dart:ui'; // Import for BackdropFilter
-
 import 'package:flutter/material.dart';
-import 'package:project_new/ReadMorePage.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Message(),
-    );
-  }
-}
+import 'package:project_new/NextPage.dart';
 
 class Message extends StatefulWidget {
   const Message({super.key});
 
   @override
-  _MessageState createState() => _MessageState();
+  State<Message> createState() => _MessageState();
 }
 
-class _MessageState extends State<Message> {
-  final PageController _pageController = PageController();
-  final List<String> _images = [
-    'assets/piano.jpg',
-    'assets/party.jpg',
-    'assets/cat.jpg',
-    // Add more images here
-  ];
-  Timer? _timer;
+class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
 
   @override
   void initState() {
     super.initState();
-    _startAutoScroll();
-  }
+    // Create an AnimationController with an infinite loop
+    _controller = AnimationController(
+      duration: const Duration(seconds: 10),
+      vsync: this,
+    )..repeat(); // Repeat indefinitely
 
-  void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-      if (_pageController.hasClients) {
-        int nextPage = (_pageController.page?.toInt() ?? 0) + 1;
-        if (nextPage >= _images.length) {
-          nextPage = 0; // Reset to the first page
-        }
-        _pageController.animateToPage(
-          nextPage,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
+    // Define the animation from right to left
+    _animation = Tween<Offset>(
+      begin: const Offset(1.0, 0.0), // Start from the right side
+      end: const Offset(-1.0, 0.0), // End on the left side
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.linear, // Smooth constant scrolling
+    ));
   }
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel the timer when the widget is disposed
-    _pageController.dispose();
+    _controller.dispose(); // Dispose of the controller when done
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Use a gradient for the background
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFEECDA3), Color(0xFFEF629F)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppBar(
-                automaticallyImplyLeading: false, // Remove the back arrow
-                backgroundColor: Colors.transparent, // Make the AppBar background transparent
-                elevation: 0, // Remove the shadow
-                title: Container(
-                  width: 700, // Set the width for the search bar
-                  height: 40,
-                  margin: const EdgeInsets.only(top: 10), // Add margin to separate from text
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 255, 229, 229),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.black, width: 2), // Add border here
-                  ),
-                  child: Center(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            // Clear the search field
-                          },
-                        ),
-                        hintText: 'Search...',
-                        border: InputBorder.none,
+              Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'Latest Information & Updates',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF483D8B),
                       ),
                     ),
-                  ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Stay informed with the latest news and updates. Discover innovations, trends,',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[700],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
-              // Enhanced styling for the header text
-              Container(
-                padding: const EdgeInsets.all(14.0), // Add padding
-                width: double.infinity, // Take full width
-                child: Container(
-                  padding: const EdgeInsets.all(16.0), // Add padding around the text
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFFFAF3F3), Color(0xFFFFB6B9)], // Light pastel colors
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+              SizedBox(height: 16),
+              // Fixed height for PageView to prevent overflow
+              SizedBox(
+                height: 450, // Adjust height as needed
+                child: PageView(
+                  children: [
+                    _buildPage(
+                      title: 'World Trends 2024',
+                      content: 'Catch up on the latest global trends for 2024, from economic shifts to social movements. This section highlights key areas to watch and offers insights into how these trends could affect individuals and businesses worldwide.',
                     ),
-                    borderRadius: BorderRadius.circular(15), // Rounded corners
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black45,
-                        blurRadius: 8,
-                        offset: Offset(2, 2),
+                    _buildPage(
+                      title: 'Insights and Analysis',
+                      content: 'Dive deeper into the details behind these trends and understand how they may impact various industries. Gain insights that can help shape your perspective and decisions for the coming year.',
+                    ),
+                    _buildPage(
+                      title: 'Future Predictions',
+                      content: 'Explore predictions for the future and understand potential changes in technology, economy, and society. These insights will help you stay prepared and informed about what lies ahead.',
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20), // Space between the PageView and the Additional Info
+              
+              // Container for Additional Information Section
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'ADDITIONAL INFORMATION',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey[800],
                       ),
-                    ],
-                  ),
-                  child: const Text(
-                    '▶ 𝕴𝖓𝖋𝖔𝖗𝖒𝖆𝖙𝖎𝖔𝖓 ◀', // Enhanced text
-                    style: TextStyle(
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black, // Dark color for better contrast
-                      shadows: [
-                        Shadow(
-                          blurRadius: 10,
-                          offset: Offset(2, 2),
-                          color: Colors.white, // Add a white shadow to enhance readability
+                    ),
+                    SizedBox(height: 16),
+                    GridView.count(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(), // Disable scrolling for GridView inside Column
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      children: [
+                        _buildInfoCard(
+                          icon: Icons.campaign,
+                          title: 'EXCITING NEWS',
+                          content: 'Stay tuned for the latest updates and exciting news!',
+                        ),
+                        _buildInfoCard(
+                          icon: Icons.rocket_launch,
+                          title: 'NEW LAUNCHES',
+                          content: 'We’re launching new products! Don’t miss out on the latest releases.',
+                        ),
+                        _buildInfoCard(
+                          icon: Icons.public,
+                          title: 'NEW LAUNCHES',
+                          content: 'Stay tuned for the latest updates and exciting news!',
+                        ),
+                        _buildInfoCard(
+                          icon: Icons.lightbulb,
+                          title: 'EXCITING NEWS',
+                          content: 'We’re launching new products! Don’t miss out on the latest releases.',
                         ),
                       ],
                     ),
-                    textAlign: TextAlign.center, // Center the text horizontally
-                  ),
+                  ],
                 ),
               ),
-              SizedBox(
-                height: 250, // Adjust the height of the image container
-                width: 380,  // Adjust the width of the image container
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _images.length,
-                  scrollDirection: Axis.vertical, // Scroll vertically
-                  itemBuilder: (context, index) {
-                    return AnimatedBuilder(
-                      animation: _pageController,
-                      builder: (context, child) {
-                        double pageOffset = (_pageController.page ?? 0) - index;
-                        double rotateX = pageOffset * 0.3; // Adjust the rotation angle for vertical scroll
-                        return Transform(
-                          transform: Matrix4.identity()
-                            ..setEntry(3, 2, 0.002) // Set the perspective
-                            ..rotateX(rotateX), // Rotate the page
-                          alignment: Alignment.center,
-                          child: Stack(
-                            children: [
-                              Positioned.fill(
-                                child: Container(
-                                  margin: const EdgeInsets.all(0), // Removed margin
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    image: DecorationImage(
-                                      image: AssetImage(_images[index]),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  child: BackdropFilter(
-                                    filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2), // Apply a more noticeable blur effect
-                                    child: Container(
-                                      color: Colors.black.withOpacity(0.2), // Slightly darken the background
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 10, // Position the heading text at the top
-                                left: 10,
-                                right: 10,
-                                child: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  color: Colors.black.withOpacity(0.7), // Darker background for better text visibility
-                                  child: Text(
-                                    'Heading for image $index',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22, // Increased font size for heading
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis, // Handle text overflow
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 10, // Position the message text at the bottom
-                                left: 10,
-                                right: 10,
-                                child: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  color: Colors.black.withOpacity(0.7), // Darker background for better text visibility
-                                  child: Text(
-                                    'Message for image $index',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.end,
-                                    overflow: TextOverflow.ellipsis, // Handle text overflow
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-              // Enhanced styling for the footer text
+              
+              // Scrolling Text Section with Animation in one line
               Container(
-                padding: const EdgeInsets.all(14.0), // Add padding
-                width: double.infinity, // Take full width
-                child: Container(
-                  padding: const EdgeInsets.all(16.0), // Add padding around the text
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFFFFE6E6), Color(0xFFFF9AA2)], // Light pastel colors
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                width: double.infinity,
+                height: 90,
+                margin: EdgeInsets.only(top: 20),
+                decoration: BoxDecoration(
+                  color: Color(0xFFB3E5FC), // Light pastel blue
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: Offset(0, 6),
                     ),
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 8,
-                        offset: Offset(2, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Text(
-                    '🔥𝗛𝗢𝗧 𝗡𝗘𝗪𝗦🔥', // New text here
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: Colors.black, // Dark color for better contrast
-                      fontWeight: FontWeight.bold,
+                  ],
+                ),
+                child: ClipRect(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal, // Horizontal scrolling
+                    child: Row(
+                      children: [
+                        AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            return Transform.translate(
+                              offset: _animation.value * MediaQuery.of(context).size.width,
+                              child: child,
+                            );
+                          },
+                          child: RichText(
+                            text: TextSpan(
+                              children: [
+                                WidgetSpan(
+                                  child: Icon(
+                                    Icons.warning,
+                                    color: Color.fromARGB(255, 206, 195, 32), // ไอคอนเป็นสีแดง
+                                    size: 40,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ' Attention: Don\'t Miss Our Latest Updates! ',
+                                  style: TextStyle(
+                                    fontSize: 35,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Quicksand',
+                                    color: Color(0xFFE0FFFF), // Light cyan color
+                                    letterSpacing: 2,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black.withOpacity(0.5),
+                                        blurRadius: 8,
+                                        offset: Offset(2, 2),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+
+
+                        
+                            ),
+                          ),
+                        ),
+                        
+                      ],
+                      
+                      
                     ),
-                    textAlign: TextAlign.center, // Center the text horizontally
+                    
                   ),
                 ),
               ),
-              // Cards section
-SizedBox(
-  height: 500, // Adjust the height of the GridView container
-  child: GridView.builder(
-    padding: const EdgeInsets.all(16.0),
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 1, // One card per row
-      crossAxisSpacing: 16.0,
-      mainAxisSpacing: 16.0,
-      childAspectRatio: 2.5,
-    ),
-    itemCount: 3, // Number of cards
-    itemBuilder: (context, index) {
-      return Card(
-        color: const Color(0xFFFFC1E3), // Softer pink color for the card background
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.card_giftcard,
-              size: 50,
-              color: Color(0xFFFF69B4), // Hot pink color for the icon
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Card ${index + 1}',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black, // Darker text color for contrast
+                     SizedBox(height: 20),
+
+              // Event Announcement Section
+              _buildEventAnnouncement(
+                title: 'Event Announcement',
+                imagePath: 'assets/pop3.jpg',
+                description: 'Join us for an unforgettable event filled with amazing experiences, new opportunities, and thrilling moments. Save the date!',
+                buttonText: 'Learn More',
+                onPressed: () {
+                  // Add your navigation or functionality here
+                },
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'This is the description for card ${index + 1}.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.black, // Darker text color for contrast
+
+              SizedBox(height: 20),
+
+              // Special Event Announcement Section
+              _buildEventAnnouncement(
+                title: 'Special Event Announcement',
+                imagePath: 'assets/pop3.jpg',
+                description: 'Don\'t miss our special event featuring exclusive content and unique experiences. Mark your calendar!',
+                buttonText: 'Find Out More',
+                onPressed: () {
+                  // Add your navigation or functionality here
+                },
               ),
-            ),
-          ],
-        ),
+                      SizedBox(height: 20),
+
+          Center(
+  child: ElevatedButton(
+    onPressed: () {
+      // Navigate to the Next Page when button is pressed
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => NextPage()), // NextPage is the new page we created
       );
     },
+    style: ElevatedButton.styleFrom(
+      primary: const Color.fromARGB(255, 38, 44, 48), // Customize button color
+      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+    ),
+    child: Text(
+      'Next Page',
+      style: TextStyle(
+        color: Colors.white, // เปลี่ยนสีข้อความที่นี่
+        fontSize: 18,         // ปรับขนาดข้อความถ้าต้องการ
+        fontWeight: FontWeight.bold, // ปรับน้ำหนักของฟอนต์
+      ),
+    ),
   ),
-),
-
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ReadMorePage()), // Navigate to the ReadMorePage
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0), // Adjusted padding
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white, // Background color
-                      borderRadius: BorderRadius.circular(20), // Rounded corners
-                      border: Border.all(color: Color.fromARGB(255, 249, 27, 216), width: 2), // Border color and width
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 8,
-                          offset: Offset(2, 2),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0), // Padding inside the container
-                      child: Text(
-                        'ℝ𝔼𝔸𝔻 𝕄𝕆ℝ𝔼 >>',
-                        style: const TextStyle(
-                          fontSize: 20, // Slightly larger font size
-                          color: Color.fromARGB(255, 255, 144, 222), // Color to match the border
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+)
+              
             ],
           ),
         ),
+      ),
+    );
+  }
+
+
+   Widget _buildEventAnnouncement({
+    required String title,
+    required String imagePath,
+    required String description,
+    required String buttonText,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 247, 237, 213),
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF738FFE),
+            ),
+          ),
+          SizedBox(height: 25),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              width: 350,
+              height: 400,
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            description,
+            style: TextStyle(fontSize: 16, color: Colors.black),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: onPressed,
+            style: ElevatedButton.styleFrom(
+              primary: Color.fromARGB(255, 214, 217, 221),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+            ),
+            child: Text(buttonText),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  
+
+  Widget _buildPage({required String title, required String content}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 200, 189, 189),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: 
+              Image.network(
+                'https://via.placeholder.com/400x400',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          SizedBox(height: 25),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.deepPurple[800],
+            ),
+          ),
+          SizedBox(height: 12),
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[800],
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({required IconData icon, required String title, required String content}) {
+    return Container(
+      width: double.infinity, // ตั้งให้เต็มความกว้างของช่องใน GridView
+      height: 150, // ตั้งค่าความสูงตามที่ต้องการ
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 25, color: Colors.blueGrey[700]),
+          SizedBox(height: 25),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueGrey[800],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 12),
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+              height: 1.4,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

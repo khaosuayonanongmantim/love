@@ -6,6 +6,9 @@ import 'package:project_new/PageReserveTicket/ZoneCLPage.dart';
 import 'package:project_new/PageReserveTicket/ZoneCRPage.dart';
 import 'package:project_new/PageReserveTicket/ZoneDLPage.dart';
 import 'package:project_new/PageReserveTicket/ZoneDRPage.dart';
+import 'package:project_new/PageReserveTicket/ZoneBLPage.dart';
+import 'package:project_new/PageReserveTicket/ZoneBRPage.dart';
+
 
 class ConcertPlan extends StatefulWidget {
   const ConcertPlan({super.key});
@@ -19,6 +22,8 @@ class _ConcertPlanState extends State<ConcertPlan> {
     final pageMap = {
       'AL': ZoneALPage(),
       'AR': ZoneARPage(),
+      'BL': ZoneBLPage(),
+      'BR': ZoneBRPage(),
       'VIP': ZoneVIPPage(),
       'CL': ZoneCLPage(),
       'CR': ZoneCRPage(),
