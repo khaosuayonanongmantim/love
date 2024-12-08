@@ -11,8 +11,6 @@ class RegScreen extends StatefulWidget {
 
 class _RegScreenState extends State<RegScreen> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController(); // last_name controller
-  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
@@ -21,18 +19,6 @@ class _RegScreenState extends State<RegScreen> {
 
   // ฟังก์ชันสำหรับการสมัครสมาชิก
   Future<void> _register() async {
-    if (_nameController.text.isEmpty ||
-        _lastNameController.text.isEmpty ||
-        _phoneController.text.isEmpty ||
-        _emailController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _confirmPasswordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
-      );
-      return; // ไม่ทำการสมัครหากมีฟิลด์ที่ว่าง
-    }
-
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
@@ -45,13 +31,11 @@ class _RegScreenState extends State<RegScreen> {
     });
 
     try {
-      final uri = Uri.parse("http://172.18.113.228/LoveProject/register.php"); // เปลี่ยน IP Address ตามจริง
+      final uri = Uri.parse("http://192.168.66.228/LoveProject/register.php"); // เปลี่ยน IP Address ตามจริง
       final response = await http.post(
         uri,
         body: {
           'first_name': _nameController.text,
-          'last_name': _lastNameController.text,
-          'phone': _phoneController.text,
           'email': _emailController.text,
           'password': _passwordController.text,
         },
@@ -151,30 +135,6 @@ class _RegScreenState extends State<RegScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Last Name Input Field
-                    TextField(
-                      controller: _lastNameController, // ใช้ controller นี้
-                      decoration: const InputDecoration(
-                        labelText: 'Last Name',
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 157, 23, 184),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Phone Input Field
-                    TextField(
-                      controller: _phoneController, // ใช้ controller นี้
-                      decoration: const InputDecoration(
-                        labelText: 'Phone',
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 157, 23, 184),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
                     // Email Input Field
                     TextField(
                       controller: _emailController,
@@ -215,9 +175,7 @@ class _RegScreenState extends State<RegScreen> {
                     const SizedBox(height: 30),
                     // Sign Up Button
                     ElevatedButton(
-                      onPressed: _isLoading
-                          ? null
-                          : _register, // ปุ่มจะไม่สามารถกดได้หากกำลังโหลดอยู่
+                      onPressed: _isLoading ? null : _register,
                       style: ElevatedButton.styleFrom(
                         primary: const Color.fromARGB(255, 164, 60, 244),
                         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),

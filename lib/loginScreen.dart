@@ -1,38 +1,79 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:project_new/bottom_navber.dart';
+import 'package:project_new/regScreen.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: const Color(0xff281537),
-        inputDecorationTheme: const InputDecorationTheme(
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color.fromARGB(255, 157, 23, 184)),
-          ),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey),
-          ),
-          labelStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 157, 23, 184),
-          ),
-        ),
-      ),
-      home: const LoginScreen(),
-    );
-  }
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+
+  // Function สำหรับการเข้าสู่ระบบ
+  Future<void> login() async {
+  setState(() {
+    _isLoading = true;
+  });
+
+  // ตรวจสอบว่าอีเมลและรหัสผ่านถูกกรอกหรือไม่
+  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please fill in both email and password")),
+    );
+    setState(() {
+      _isLoading = false;
+    });
+    return; // หยุดการทำงานถ้ากรอกข้อมูลไม่ครบ
+  }
+
+  final String apiUrl = "http://172.18.113.228/LoveProject/login.php"; // URL ไฟล์ PHP
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      body: {
+        "email": _emailController.text,
+        "password": _passwordController.text,
+      },
+    );
+
+    final data = json.decode(response.body);
+
+    if (data['status'] == "success") {
+      // หากเข้าสู่ระบบสำเร็จ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Welcome, ${data['data']['first_name']}")),
+      );
+      print("Login Successful: ${data['data']}");
+
+      // เปลี่ยนหน้าไปยัง BottomNavBar
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => BottomNavbar()), // เปลี่ยนเป็นหน้าของคุณ
+      );
+    } else {
+      // หากเกิดข้อผิดพลาด
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(data['message'])),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: Unable to connect to the server")),
+    );
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +88,7 @@ class LoginScreen extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   Color.fromARGB(255, 103, 102, 175),
-              Color.fromARGB(255, 158, 221, 232),
+                  Color.fromARGB(255, 158, 221, 232),
                 ],
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
@@ -72,7 +113,7 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Main Login Container wrapped in SingleChildScrollView
+          // Main Login Container
           SingleChildScrollView(
             padding: const EdgeInsets.only(top: 200.0),
             child: Container(
@@ -87,34 +128,36 @@ class LoginScreen extends StatelessWidget {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 5,
                     blurRadius: 15,
-                    offset: const Offset(0, 3), // changes position of shadow
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 24),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18.0, vertical: 24),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     // Email Input Field
                     TextField(
-                      decoration: InputDecoration(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
                         labelText: 'Email',
-                        suffixIcon: const Icon(
+                        suffixIcon: Icon(
                           Icons.email,
                           color: Color.fromARGB(255, 157, 23, 184),
                         ),
                       ),
                       cursorColor: const Color.fromARGB(255, 157, 23, 184),
-                      autofocus: false,
                     ),
                     const SizedBox(height: 20),
                     // Password Input Field
                     TextField(
+                      controller: _passwordController,
                       obscureText: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Password',
-                        suffixIcon: const Icon(
+                        suffixIcon: Icon(
                           Icons.visibility_off,
                           color: Color.fromARGB(255, 157, 23, 184),
                         ),
@@ -125,7 +168,7 @@ class LoginScreen extends StatelessWidget {
                     // Forgot Password
                     Align(
                       alignment: Alignment.centerRight,
-                      child: Text(
+                      child: const Text(
                         'Forgot Password?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -137,24 +180,25 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 40),
                     // Sign In Button
                     ElevatedButton(
-                      onPressed: () {
-                        // Handle sign-in logic
-                      },
+                      onPressed: _isLoading ? null : login,
                       style: ElevatedButton.styleFrom(
-                        primary: Color.fromARGB(255, 164, 60, 244), // Background color
+                        primary: const Color.fromARGB(255, 164, 60, 244),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 100),
                       ),
-                      child: const Text(
-                        'SIGN IN',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'SIGN IN',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                     const SizedBox(height: 50),
                     // Sign Up Option
@@ -172,7 +216,11 @@ class LoginScreen extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              // Handle sign-up navigation
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const RegScreen()),
+                              );
                             },
                             child: const Text(
                               "Sign up",
