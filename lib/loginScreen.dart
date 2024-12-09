@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return; // หยุดการทำงานถ้ากรอกข้อมูลไม่ครบ
   }
 
-  final String apiUrl = "http://172.18.113.228/LoveProject/login.php"; // URL ไฟล์ PHP
+  final String apiUrl = "http://172.18.101.208/LoveProject/login.php"; // URL ไฟล์ PHP
   try {
     final response = await http.post(
       Uri.parse(apiUrl),
