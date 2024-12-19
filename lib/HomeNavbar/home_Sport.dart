@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_new/HomeNavbar/BuyTicketSport.dart';
 
 class HomeSport extends StatefulWidget {
   const HomeSport({super.key});
@@ -544,7 +545,12 @@ class _HomeSportState extends State<HomeSport> {
                                                         Alignment.centerLeft,
                                                     child: ElevatedButton(
                                                       onPressed: () {
-                                                        // Add your ticket purchasing logic here
+                                                           Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                     builder: (context) => SportPlan(),
+                                                       ),
+                                                       );
+
                                                       },
                                                       child: Text('ซื้อบัตร'),
                                                       style: ElevatedButton

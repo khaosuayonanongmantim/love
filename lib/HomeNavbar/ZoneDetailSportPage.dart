@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-class ZoneDetailPage extends StatefulWidget {
+class ZoneDetailSportPage extends StatefulWidget {
   final String zoneName;
   final String selectedPrice;
 
-  const ZoneDetailPage({Key? key, required this.zoneName, required this.selectedPrice}) : super(key: key);
+  const ZoneDetailSportPage({Key? key, required this.zoneName, required this.selectedPrice}) : super(key: key);
 
   @override
-  _ZoneDetailPageState createState() => _ZoneDetailPageState();
+  _ZoneDetailSportPageState createState() => _ZoneDetailSportPageState();
 }
 
-class _ZoneDetailPageState extends State<ZoneDetailPage> {
+class _ZoneDetailSportPageState extends State<ZoneDetailSportPage> {
   List<bool> seats = List.generate(100, (_) => false); // Seat statuses
   List<String> selectedSeats = []; // Track selected seats
 
@@ -48,7 +48,6 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 
-  
  double calculateTotalPrice() {
   try {
     // ล้างข้อมูล widget.selectedPrice ให้แน่ใจว่าไม่มีปัญหา
@@ -140,7 +139,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                   String seatLabel = '${widget.zoneName}${(index ~/ 10) + 1}-${(index % 10) + 1}';
 
                   return GestureDetector(
-                      onTap: () {
+                    onTap: () {
   setState(() {
     seats[index] = !seats[index];
     if (seats[index]) {
@@ -152,6 +151,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
     print("Updated Total Price: ${calculateTotalPrice()}");
   });
 },
+
                     child: Container(
                       decoration: BoxDecoration(
                         color: seats[index] ? Colors.green : Colors.blue,
@@ -190,9 +190,9 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
               const SizedBox(height: 20),
 
               // Total price
-             Text(
-             'ราคารวม: ฿${calculateTotalPrice().toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+              Text(
+                'ราคารวม: ฿${calculateTotalPrice().toStringAsFixed(2)}',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
               ),
               const SizedBox(height: 20),
 
