@@ -1,6 +1,66 @@
-import 'dart:convert';
+Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(height: 30),
+        Container(
+          padding: const EdgeInsets.all(5),
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 126, 198, 207),
+            border: Border.all(
+              color: Colors.white,
+              width: 2.0,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 219, 235, 248),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.blue,
+                    width: 2.0,
+                  ),
+                ),
+                child: Text(
+                  "🎤 Upcoming Concerts 🎶",
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              SizedBox(height: 8),
+              _isLoading
+                  ? CircularProgressIndicator()
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _concerts.map((concert) {
+                          return buildVerticalImageWithText(
+                            concert['image'] ?? 'assets/default.jpg',
+                            concert['name'] ?? 'Unknown Title',
+                            concert['date'] ?? 'Unknown Date',
+                            concert['time'] ?? 'Unknown Time',
+                            concert['location'] ?? 'Unknown Location',
+                          );
+                        }).toList(),
+                      ),
+                    ),
+            ],
+          ),
+        ),
+
+
+
+        import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:project_new/HomeNavbar/recommant_information.dart';
 import 'package:http/http.dart' as http;
 
 class RecommendedHome extends StatefulWidget {
@@ -11,17 +71,13 @@ class RecommendedHome extends StatefulWidget {
 }
 
 class _RecommendedHomeState extends State<RecommendedHome> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
- List<dynamic> _concerts = [];
- List<dynamic> _sports = [];
+  List<dynamic> _concerts = [];
   bool _isLoading = true;
 
-   @override
+  @override
   void initState() {
     super.initState();
     fetchConcerts();
-    fetchSports();
   }
 
   Future<void> fetchConcerts() async {
@@ -32,7 +88,6 @@ class _RecommendedHomeState extends State<RecommendedHome> {
           _concerts = jsonDecode(response.body);
           _isLoading = false;
         });
-
       } else {
         print('Failed to load concerts: ${response.statusCode}');
       }
@@ -41,46 +96,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
     }
   }
 
-   Future<void> fetchSports() async {
-    try {
-      final response = await http.get(Uri.parse('http://172.18.121.190:5000/getAllSportsFootball'));
-      if (response.statusCode == 200) {
-        setState(() {
-          _sports = jsonDecode(response.body);
-          _isLoading = false;
-        });
-
-      } else {
-        print('Failed to load concerts: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching concerts: $e');
-    }
-  }
-
-  void _nextPage() {
-    if (_currentPage < 2) {
-      _currentPage++;
-      _pageController.animateToPage(
-        _currentPage,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-    void _previousPage() {
-    if (_currentPage > 0) {
-      _currentPage--;
-      _pageController.animateToPage(
-        _currentPage,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  @override
+    @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -129,7 +145,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
               SizedBox(height: 8), // เพิ่มระยะห่างระหว่างข้อความและ ScrollView
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                  child: Row(
+                child: Row(
                         children: _concerts.map((concert) {
                           return buildVerticalImageWithText(
                             concert['image'] ?? 'assets/default.jpg',
@@ -251,7 +267,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
     );
   }
 
- Widget buildVerticalImageWithText(
+Widget buildVerticalImageWithText(
   String imagePath,
   String title,
   String date,
@@ -359,6 +375,8 @@ class _RecommendedHomeState extends State<RecommendedHome> {
     ),
   );
 }
+}
+
 
   // เกี่ยวกับส่วนของสถานที่บันเทิง
   Widget buildImageWithText(
@@ -396,4 +414,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
       ),
     );
   }
-}
+
+      ],
+    );
+  }

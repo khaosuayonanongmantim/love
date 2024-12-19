@@ -33,37 +33,48 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     return; // หยุดการทำงานถ้ากรอกข้อมูลไม่ครบ
   }
-
-  final String apiUrl = "http://172.18.101.208/LoveProject/login.php"; // URL ไฟล์ PHP
+// http://127.0.0.1/
+// 172.18.121.190:5000
+   final String apiUrl = "http://172.18.121.190:5000/login";
   try {
     final response = await http.post(
-      Uri.parse(apiUrl),
-      body: {
-        "email": _emailController.text,
-        "password": _passwordController.text,
-      },
+  Uri.parse(apiUrl),
+  headers: {"Content-Type": "application/json"},
+  body: jsonEncode({
+    "email": _emailController.text.trim(),
+    "password": _passwordController.text,
+  }),
+);
+
+     // พิมพ์ข้อมูล Response เพื่อดูใน Terminal
+  print("Response Status Code: ${response.statusCode}");
+  print("Response Body: ${response.body}");
+
+   if (response.statusCode == 200) {
+  final data = json.decode(response.body);
+  print("Parsed Data: $data");
+
+  if (data['role'] == "user") {
+    String firstName = data['first_name'] ?? "User"; // Handle null values
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Welcome, $firstName")),
     );
 
-    final data = json.decode(response.body);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => BottomNavbar()),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: Invalid role.")),
+    );
+  }
+} else {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text("Error: ${response.statusCode}")),
+  );
+}
 
-    if (data['status'] == "success") {
-      // หากเข้าสู่ระบบสำเร็จ
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Welcome, ${data['data']['first_name']}")),
-      );
-      print("Login Successful: ${data['data']}");
-
-      // เปลี่ยนหน้าไปยัง BottomNavBar
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => BottomNavbar()), // เปลี่ยนเป็นหน้าของคุณ
-      );
-    } else {
-      // หากเกิดข้อผิดพลาด
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(data['message'])),
-      );
-    }
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Error: Unable to connect to the server")),
@@ -74,6 +85,46 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 }
+//   final String apiUrl = "http://172.18.114.161/LoveProject/login.php"; // URL ไฟล์ PHP
+//   try {
+//     final response = await http.post(
+//       Uri.parse(apiUrl),
+//       body: {
+//         "email": _emailController.text,
+//         "password": _passwordController.text,
+//       },
+//     );
+
+//     final data = json.decode(response.body);
+// print("Response Body: ${response.body}");
+//     if (data['status'] == "success") {
+//       // หากเข้าสู่ระบบสำเร็จ
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text("Welcome, ${data['data']['first_name']}")),
+//       );
+//       print("Login Successful: ${data['data']}");
+
+//       // เปลี่ยนหน้าไปยัง BottomNavBar
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(builder: (context) => BottomNavbar()), // เปลี่ยนเป็นหน้าของคุณ
+//       );
+//     } else {
+//       // หากเกิดข้อผิดพลาด
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text(data['message'])),
+//       );
+//     }
+//   } catch (e) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text("Error: Unable to connect to the server")),
+//     );
+//   } finally {
+//     setState(() {
+//       _isLoading = false;
+//     });
+//   }
+// }
 
   @override
   Widget build(BuildContext context) {

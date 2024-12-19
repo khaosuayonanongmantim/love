@@ -45,7 +45,7 @@ class _RegScreenState extends State<RegScreen> {
     });
 
     try {
-      final uri = Uri.parse("http://172.18.101.208/LoveProject/register.php"); // เปลี่ยน IP Address ตามจริง
+      final uri = Uri.parse("http://172.18.114.161/LoveProject/register.php"); // เปลี่ยน IP Address ตามจริง
       final response = await http.post(
         uri,
         body: {
