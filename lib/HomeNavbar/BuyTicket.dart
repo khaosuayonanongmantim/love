@@ -21,6 +21,11 @@ class _ConcertPlanState extends State<ConcertPlan> {
 void initState() {
   super.initState();
   // เพิ่มโซนทั้งหมดและราคาที่ตรงกัน
+
+
+  
+
+  
   seatZones = [
     'STD', // โซนราคา 2,500
     'BB1', 'BB2', 'BB3', 'BB4', 'BB5', 'BB6', // โซนราคา 3,500
