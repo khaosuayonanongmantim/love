@@ -26,7 +26,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
 
   Future<void> fetchConcerts() async {
     try {
-      final response = await http.get(Uri.parse('http://172.18.121.190:5000/getAllConcerts'));
+      final response = await http.get(Uri.parse('http://172.18.117.238:5000/getAllConcerts'));
       if (response.statusCode == 200) {
         setState(() {
           _concerts = jsonDecode(response.body);
@@ -43,7 +43,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
 
    Future<void> fetchSports() async {
     try {
-      final response = await http.get(Uri.parse('http://172.18.121.190:5000/getAllSportsFootball'));
+      final response = await http.get(Uri.parse('http://172.18.117.238:5000/getAllSportsFootball'));
       if (response.statusCode == 200) {
         setState(() {
           _sports = jsonDecode(response.body);
@@ -259,7 +259,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
   String location,
 ) {
   // สร้าง URL ของภาพที่ถูกต้อง
-  String imageUrl = 'http://172.18.121.190/concert/all/$imagePath';
+  String imageUrl = 'http://172.18.117.238/concert/all/$imagePath';
 
   return Padding(
     padding: const EdgeInsets.all(8.0),

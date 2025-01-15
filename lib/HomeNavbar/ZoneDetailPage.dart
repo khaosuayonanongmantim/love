@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:project_new/HomeNavbar/BookingSummaryPage.dart';
 
 class ZoneDetailPage extends StatefulWidget {
   final String zoneName;
@@ -48,8 +49,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 
-  
- double calculateTotalPrice() {
+ Map<String, double> calculateTotalPrice() {
   try {
     // ล้างข้อมูล widget.selectedPrice ให้แน่ใจว่าไม่มีปัญหา
     String cleanedPrice = widget.selectedPrice.replaceAll(RegExp(r'[^\d.]'), ''); // เก็บเฉพาะตัวเลขและจุดทศนิยม
@@ -57,21 +57,37 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
 
     // ตรวจสอบค่า selectedSeats ว่ามีจำนวนถูกต้อง
     int selectedCount = selectedSeats.length;
-    double totalPrice = ticketPrice * selectedCount;
+    double totalSeatPrice = ticketPrice * selectedCount;
 
-    // ตรวจสอบผลรวม
-    print("Ticket price: $ticketPrice, Selected count: $selectedCount, Total price: $totalPrice");
+    // คำนวณ VAT และค่าธรรมเนียมบริการ
+    const double vatRate = 0.07; // VAT 7%
+    const double serviceFeeRate = 0.07 * 1.07; // ค่าธรรมเนียม 5%
 
-    return totalPrice;
+    double vatAmount = totalSeatPrice * vatRate;
+    double serviceFee = totalSeatPrice * serviceFeeRate;
+    double totalPrice = totalSeatPrice + vatAmount + serviceFee;
+    
+
+    // คืนค่าทั้งหมด
+    return {
+      "totalPrice": totalPrice,
+      "vatAmount": vatAmount,
+      "serviceFee": serviceFee,
+    };
   } catch (e) {
     print("Error calculating total price: $e");
-    return 0.0; // คืนค่า 0.0 ในกรณีที่เกิดข้อผิดพลาด
+    return {
+      "totalPrice": 0.0,
+      "vatAmount": 0.0,
+      "serviceFee": 0.0,
+    };
   }
 }
 
 
   @override
   Widget build(BuildContext context) {
+  
     return Scaffold(
       appBar: AppBar(
         title: Text('รายละเอียดโซน ${widget.zoneName}'),
@@ -80,7 +96,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
+          child: Column(   
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Timer section
@@ -191,7 +207,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
 
               // Total price
              Text(
-             'ราคารวม: ฿${calculateTotalPrice().toStringAsFixed(2)}',
+             'ราคารวม: ฿${calculateTotalPrice()["totalPrice"]!.toStringAsFixed(2)}',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
               ),
               const SizedBox(height: 20),
@@ -217,6 +233,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                     );
                   } else {
                     String bookedSeats = selectedSeats.join(', ');
+                    Map<String, double> priceDetails = calculateTotalPrice();
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
@@ -225,7 +242,22 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                         actions: [
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop();
+                                Navigator.of(context).pop();
+                // นำทางไปหน้า BookingSummaryPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BookingSummaryPage(
+                      zoneName: widget.zoneName,
+                    selectedSeats: selectedSeats,
+                    totalPrice: priceDetails["totalPrice"]!,
+                    vatAmount: priceDetails["vatAmount"]!,
+                    serviceFee: priceDetails["serviceFee"]!,
+                    
+                    ),
+                  ),
+                );
+              
                             },
                             child: const Text('ตกลง'),
                           ),

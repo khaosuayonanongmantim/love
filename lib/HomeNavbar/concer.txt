@@ -493,4 +493,3 @@ class _RecommendedHomeState extends State<RecommendedHome> {
       ),
     );
   }
-}

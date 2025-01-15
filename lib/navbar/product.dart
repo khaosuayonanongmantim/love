@@ -596,6 +596,7 @@ const SizedBox(height: 10),
           ),
 
           // ราคาสินค้า + ปุ่ม Favorite
+          
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: .0),
             child: Row(
@@ -622,11 +623,13 @@ const SizedBox(height: 10),
                     ],
                   ),
                 ),
+                
                 IconButton(
                   icon: Icon(
                     isFavorite ? Icons.favorite : Icons.favorite_border,
                     color: isFavorite ? Colors.red : Colors.grey,
                   ),
+                  
                   onPressed: () {
                     setState(() {
                       _favorites[index] = !isFavorite;
@@ -639,9 +642,23 @@ const SizedBox(height: 10),
                     });
                   },
                 ),
-              ],
+                Flexible(
+                 child:IconButton(
+      icon: Icon(
+        Icons.shopping_cart,
+        color: Colors.blue, // สีของ Shopping Cart
+      ),
+      onPressed: () {
+        // Action สำหรับ Shopping Cart
+      },
+    ),
+                )
+  ],
+)
+              
             ),
-          ),
+          
+          
 
           // ปุ่มเพิ่ม/ลดจำนวนสินค้า
           Row(
