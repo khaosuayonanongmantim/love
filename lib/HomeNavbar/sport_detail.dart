@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:project_new/HomeNavbar/BuyTicket.dart';
 import 'package:intl/intl.dart';
+import 'package:project_new/HomeNavbar/BuyTicketSport.dart';
 
-class ConcertDetail extends StatelessWidget {
+class SportDetail extends StatelessWidget {
   final String imagePath;
   final String text1;
   final String text2;
@@ -10,7 +10,7 @@ class ConcertDetail extends StatelessWidget {
   final String text4;
   final String text5; // เพิ่ม price
 
-  const ConcertDetail({
+  const SportDetail({
     Key? key,
     required this.imagePath,
     required this.text1,
@@ -229,7 +229,7 @@ class ConcertDetail extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    ConcertPlan(), // ไปที่หน้าของคุณ
+                                    SportPlan(), // ไปที่หน้าของคุณ
                               ),
                             );
                           },

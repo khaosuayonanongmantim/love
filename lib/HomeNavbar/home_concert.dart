@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:async'; // Import dart:async for Timer
 import 'package:flutter/material.dart';
-import 'package:project_new/HomeNavbar/BuyTicket.dart';
+import 'package:project_new/HomeNavbar/concert_enjoy.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'concert_detail.dart'; // Import the ConcertDetail widget
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class HomeConcert extends StatefulWidget {
   const HomeConcert({super.key});
@@ -16,131 +19,338 @@ class _HomeConcertState extends State<HomeConcert> {
   Timer? _timer;
   int selectedIndex = 0; // Store the selected index
   String selectedCategory = 'ทั้งหมด'; // Track the selected category
+  List<dynamic> _concertImage = [];
+  List<dynamic> _concertsEnjoy = [];
+  List<dynamic> _concerts = [];
+  List<dynamic> _concertsThaimass = [];
+  List<dynamic> _concertsTpop = [];
+  List<dynamic> _concertsKpop = [];
+  List<dynamic> _concertsInter = [];
+  bool _isLoading = true;
 
   // Define the items for each category
-  final Map<String, List<Map<String, String>>> categoryItems = {
-    'ทั้งหมด': [
-      {
-        'imagePath': 'assets/bar.jpg',
-        'text1': 'ʀᴏᴄᴋ ᴄᴏɴᴄᴇʀᴛ',
-        'text2': '10 ตุลาคม 2567',
-        'text3': '9 PM',
-        'text4': 'Main Stage',
-        'boxColor': '0xFFFFFFFF',
-        'textColor': '0xFF000000'
-      },
-      {
-        'imagePath': 'assets/bar1.jpg',
-        'text1': 'ᴊᴀᴢᴢ ɴɪɢʜᴛ',
-        'text2': '12 กันยายน 2567',
-        'text3': '8 PM',
-        'text4': 'Side Stage',
-        'boxColor': '0xFFFFFFFF',
-        'textColor': '0xFF000000'
-      },
-      {
-        'imagePath': 'assets/bar2.jpg',
-        'text1': 'ᴘᴏᴘ ꜰᴇꜱᴛ',
-        'text2': '11 คุลาคม 2567',
-        'text3': '7 PM',
-        'text4': 'Main Stage',
-        'boxColor': '0xFFFFFFFF',
-        'textColor': '0xFF000000'
-      },
-      {
-        'imagePath': 'assets/con3.jpg',
-        'text1': 'ᴛʀᴀɴᴄᴇ ᴍᴀɴɪᴀ',
-        'text2': '4 กันยายน 2567',
-        'text3': '10 PM',
-        'text4': 'Main Arena',
-        'boxColor': '0xFFFFFFFF',
-        'textColor': '0xFF000000'
-      },
-      {
-        'imagePath': 'assets/sport1.jpg',
-        'text1': 'ɪɴᴛᴇʀ ᴍɪx',
-        'text2': '3 สิงหาคม 2567',
-        'text3': '6 PM',
-        'text4': 'Main Hall',
-        'boxColor': '0xFFFFFFFF',
-        'textColor': '0xFF000000'
-      },
-      {
-        'imagePath': 'assets/nunew.jpg',
-        'text1': 'ᴛ-ᴘᴏᴘ ɢᴀʟᴀ',
-        'text2': '10 กันยายน 2567',
-        'text3': '5 PM',
-        'text4': 'Side Hall',
-        'boxColor': '0xFFFFFFFF',
-        'textColor': '0xFF000000'
-      },
-      {
-        'imagePath': 'assets/hip.jpg',
-        'text1': 'ʜɪᴘ-ʜᴏᴘ ᴊᴀᴍ',
-        'text2': '25 กันยายน 2567',
-        'text3': '9 PM',
-        'text4': 'Outdoor Stage',
-        'boxColor': '0xFFFFFFFF',
-        'textColor': '0xFF000000'
-      },
-      // Add more items as needed
-    ],
-    'THAI MASS': [
-      {
-        'imagePath': 'assets/con3.jpg',
-        'text1': 'Trance Mania',
-        'text2': '4 กันยายน 2567',
-        'text3': '10 PM',
-        'text4': 'Main Arena',
-        'boxColor': '0xFFE0E0E0',
-        'textColor': '0xFF000000'
-      },
-      // Add more items as needed
-    ],
-    'T-POP': [
-      {
-        'imagePath': 'assets/sport1.jpg',
-        'text1': 'Inter Mix',
-        'text2': '3 สิงหาคม 2567',
-        'text3': '6 PM',
-        'text4': 'Main Hall',
-        'boxColor': '0xFFFFF3E0',
-        'textColor': '0xFF000000'
-      },
-      // Add more items as needed
-    ],
-    'K-POP': [
-      {
-        'imagePath': 'assets/nunew.jpg',
-        'text1': 'T-pop Gala',
-        'text2': '10 กันยายน 2567',
-        'text3': '5 PM',
-        'text4': 'Side Hall',
-        'boxColor': '0xFFFCE4EC',
-        'textColor': '0xFF000000'
-      },
-      // Add more items as needed
-    ],
-    'INTERNATIONAL': [
-      {
-        'imagePath': 'assets/hip.jpg',
-        'text1': 'Hip-Hop Jam',
-        'text2': '25 กันยายน 2567',
-        'text3': '9 PM',
-        'text4': 'Outdoor Stage',
-        'boxColor': '0xFFEEEEEE',
-        'textColor': '0xFF000000'
-      },
-      // Add more items as needed
-    ]
-    // Add more categories and items as needed
-  };
 
   @override
   void initState() {
     super.initState();
     _startAutoScroll();
+    fetchImages();
+    fetchConcertsEnjoy();
+    fetchConcerts();
+    fetchConcertsThaimass();
+    fetchConcertsTpop();
+    fetchConcertsKpop();
+    fetchConcertsInter();
     _controller.addListener(_onPageChanged);
+  }
+
+  String formatDate(String dateString) {
+    try {
+      DateTime dateTime = DateTime.parse(dateString);
+      return DateFormat('dd/MM/yyyy').format(dateTime);
+    } catch (e) {
+      print("Error formatting date: $e");
+      return dateString; // หากเกิดข้อผิดพลาด ให้แสดงวันที่เดิม
+    }
+  }
+
+  Future<void> fetchImages() async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://192.168.55.228:5000/concertsImage'));
+      if (response.statusCode == 200) {
+        setState(() {
+          _concertImage = jsonDecode(response.body);
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
+  }
+
+  Future<void> fetchConcertsEnjoy() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://192.168.55.228:5000/concertsDetail'));
+      if (response.statusCode == 200) {
+        setState(() {
+          _concertsEnjoy = jsonDecode(response.body);
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
+  }
+
+  var categoryItems = {
+    'ทั้งหมด': [],
+    'THAI MASS': [],
+    'T-POP': [],
+    'K-POP': [],
+    'INTERNATIONAL': [],
+  };
+
+  Future<void> fetchConcerts() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://192.168.55.228:5000/getAllConcerts'));
+      if (response.statusCode == 200) {
+        List<dynamic> concerts = jsonDecode(response.body);
+
+        // แปลงข้อมูลจาก API ให้อยู่ในรูปแบบ categoryItems
+        Map<String, List<Map<String, String>>> updatedCategories = {
+          'ทั้งหมด': [],
+          'THAI MASS': [],
+          'T-POP': [],
+          'K-POP': [],
+          'INTERNATIONAL': [],
+        };
+
+        for (var concert in concerts) {
+          String category = concert['category'] ?? 'ทั้งหมด';
+          if (!updatedCategories.containsKey(category)) {
+            updatedCategories[category] = [];
+          }
+
+          updatedCategories[category]!.add({
+            'imagePath': concert['image'] ?? 'assets/default.jpg',
+            'text1': concert['name'] ?? 'Unknown Concert',
+            'text2': concert['date'] ?? 'Unknown Date',
+            'text3': concert['time'] ?? 'Unknown Time',
+            'text4': concert['location'] ?? 'Unknown Location',
+            'text5': concert['price'] ?? 'N/A', // เพิ่มราคาที่รับจาก API
+            'boxColor': '0xFFFFFFFF',
+            'textColor': '0xFF000000',
+          });
+        }
+
+        setState(() {
+          // รวมข้อมูลของ API นี้เข้ากับ categoryItems เดิม
+          categoryItems.forEach((key, value) {
+            if (updatedCategories.containsKey(key)) {
+              categoryItems[key]!.addAll(updatedCategories[key]!);
+            }
+          });
+          _concerts = concerts;
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
+  }
+
+  Future<void> fetchConcertsThaimass() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://192.168.55.228:5000/getAllConcertsthaiMass'));
+      if (response.statusCode == 200) {
+        List<dynamic> concerts = jsonDecode(response.body);
+
+        // แปลงข้อมูลจาก API ให้อยู่ในรูปแบบ categoryItems
+        Map<String, List<Map<String, String>>> updatedCategories = {
+          'ทั้งหมด': [],
+          'THAI MASS': [],
+          'T-POP': [],
+          'K-POP': [],
+          'INTERNATIONAL': [],
+        };
+
+        for (var concert in concerts) {
+          String category = concert['category'] ?? 'THAI MASS';
+          if (!updatedCategories.containsKey(category)) {
+            updatedCategories[category] = [];
+          }
+
+          updatedCategories[category]!.add({
+            'imagePath': concert['image'] ?? 'assets/default.jpg',
+            'text1': concert['name'] ?? 'Unknown Concert',
+            'text2': concert['date'] ?? 'Unknown Date',
+            'text3': concert['time'] ?? 'Unknown Time',
+            'text4': concert['location'] ?? 'Unknown Location',
+             'text5': concert['price'] ?? 'N/A',
+            'boxColor': '0xFFFFFFFF',
+            'textColor': '0xFF000000',
+          });
+        }
+
+        setState(() {
+          // รวมข้อมูลของ API นี้เข้ากับ categoryItems เดิม
+          categoryItems.forEach((key, value) {
+            if (updatedCategories.containsKey(key)) {
+              categoryItems[key]!.addAll(updatedCategories[key]!);
+            }
+          });
+          _concertsThaimass = concerts;
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
+  }
+
+  Future<void> fetchConcertsTpop() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://192.168.55.228:5000/getAllConcertstpop'));
+      if (response.statusCode == 200) {
+        List<dynamic> concerts = jsonDecode(response.body);
+
+        // แปลงข้อมูลจาก API ให้อยู่ในรูปแบบ categoryItems
+        Map<String, List<Map<String, String>>> updatedCategories = {
+          'ทั้งหมด': [],
+          'THAI MASS': [],
+          'T-POP': [],
+          'K-POP': [],
+          'INTERNATIONAL': [],
+        };
+
+        for (var concert in concerts) {
+          String category = concert['category'] ?? 'T-POP';
+          if (!updatedCategories.containsKey(category)) {
+            updatedCategories[category] = [];
+          }
+
+          updatedCategories[category]!.add({
+            'imagePath': concert['image'] ?? 'assets/default.jpg',
+            'text1': concert['name'] ?? 'Unknown Concert',
+            'text2': concert['date'] ?? 'Unknown Date',
+            'text3': concert['time'] ?? 'Unknown Time',
+            'text4': concert['location'] ?? 'Unknown Location',
+             'text5': concert['price'] ?? 'N/A',
+            'boxColor': '0xFFFFFFFF',
+            'textColor': '0xFF000000',
+          });
+        }
+
+        setState(() {
+          categoryItems.forEach((key, value) {
+            if (updatedCategories.containsKey(key)) {
+              categoryItems[key]!.addAll(updatedCategories[key]!);
+            }
+          });
+          _concertsTpop = concerts;
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
+  }
+
+  Future<void> fetchConcertsKpop() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://192.168.55.228:5000/getAllConcertskpop'));
+      if (response.statusCode == 200) {
+        List<dynamic> concerts = jsonDecode(response.body);
+
+        // แปลงข้อมูลจาก API ให้อยู่ในรูปแบบ categoryItems
+        Map<String, List<Map<String, String>>> updatedCategories = {
+          'ทั้งหมด': [],
+          'THAI MASS': [],
+          'T-POP': [],
+          'K-POP': [],
+          'INTERNATIONAL': [],
+        };
+
+        for (var concert in concerts) {
+          String category = concert['category'] ?? 'K-POP';
+          if (!updatedCategories.containsKey(category)) {
+            updatedCategories[category] = [];
+          }
+
+          updatedCategories[category]!.add({
+            'imagePath': concert['image'] ?? 'assets/default.jpg',
+            'text1': concert['name'] ?? 'Unknown Concert',
+            'text2': concert['date'] ?? 'Unknown Date',
+            'text3': concert['time'] ?? 'Unknown Time',
+            'text4': concert['location'] ?? 'Unknown Location',
+             'text5': concert['price'] ?? 'N/A',
+            'boxColor': '0xFFFFFFFF',
+            'textColor': '0xFF000000',
+          });
+        }
+
+        setState(() {
+          categoryItems.forEach((key, value) {
+            if (updatedCategories.containsKey(key)) {
+              categoryItems[key]!.addAll(updatedCategories[key]!);
+            }
+          });
+          _concertsKpop = concerts;
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
+  }
+
+  Future<void> fetchConcertsInter() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://192.168.55.228:5000/getAllConcertsinter'));
+      if (response.statusCode == 200) {
+        List<dynamic> concerts = jsonDecode(response.body);
+
+        // แปลงข้อมูลจาก API ให้อยู่ในรูปแบบ categoryItems
+        Map<String, List<Map<String, String>>> updatedCategories = {
+          'ทั้งหมด': [],
+          'THAI MASS': [],
+          'T-POP': [],
+          'K-POP': [],
+          'INTERNATIONAL': [],
+        };
+
+        for (var concert in concerts) {
+          String category = concert['category'] ?? 'INTERNATIONAL';
+          if (!updatedCategories.containsKey(category)) {
+            updatedCategories[category] = [];
+          }
+
+          updatedCategories[category]!.add({
+            'imagePath': concert['image'] ?? 'assets/default.jpg',
+            'text1': concert['name'] ?? 'Unknown Concert',
+            'text2': concert['date'] ?? 'Unknown Date',
+            'text3': concert['time'] ?? 'Unknown Time',
+            'text4': concert['location'] ?? 'Unknown Location',
+             'text5': concert['price'] ?? 'N/A',
+            'boxColor': '0xFFFFFFFF',
+            'textColor': '0xFF000000',
+          });
+        }
+
+        setState(() {
+          categoryItems.forEach((key, value) {
+            if (updatedCategories.containsKey(key)) {
+              categoryItems[key]!.addAll(updatedCategories[key]!);
+            }
+          });
+          _concertsInter = concerts;
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
   }
 
   @override
@@ -165,7 +375,7 @@ class _HomeConcertState extends State<HomeConcert> {
 
   void _onPageChanged() {
     final page = _controller.page?.round() ?? 0;
-    if (page == 9) {
+    if (page == 3) {
       _controller.animateToPage(
         0,
         duration: Duration(milliseconds: 300),
@@ -267,27 +477,20 @@ class _HomeConcertState extends State<HomeConcert> {
                       children: [
                         const SizedBox(height: 20),
                         Container(
-                          height: 200,
+                          height: 220,
                           child: PageView(
                             controller: _controller,
-                            children: [
-                              buildCarouselItem('assets/kini.png'),
-                              buildCarouselItem('assets/nunew.jpg'),
-                              buildCarouselItem('assets/chang.jpg'),
-                              buildCarouselItem('assets/war.jpg'),
-                              buildCarouselItem('assets/cat.jpg'),
-                              buildCarouselItem('assets/piano.jpg'),
-                              buildCarouselItem('assets/wan.jpg'),
-                              buildCarouselItem('assets/threemandown.jpg'),
-                              buildCarouselItem('assets/cocktail.jpg'),
-                              buildCarouselItem('assets/scrub.jpg'),
-                            ],
+                            children: _concertImage.map((concertimg) {
+                              return buildCarouselItem(
+                                concertimg['image'] ?? 'assets/default.jpg',
+                              );
+                            }).toList(),
                           ),
                         ),
                         const SizedBox(height: 20),
                         SmoothPageIndicator(
                           controller: _controller,
-                          count: 10,
+                          count: 4,
                           effect: WormEffect(
                             dotHeight: 10,
                             dotWidth: 10,
@@ -318,13 +521,14 @@ class _HomeConcertState extends State<HomeConcert> {
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                            children: [
-                              buildImageWithText('assets/bus.jpg', 'BUS'),
-                              buildImageWithText('assets/got.jpg', 'GOT7'),
-                              buildImageWithText('assets/en.jpg', 'ENHYPEN'),
-                              buildImageWithText('assets/pix.png', 'PIXXIE'),
-                              buildImageWithText('assets/ly.jpg', 'LYKN'),
-                            ],
+                            children: _concertsEnjoy.map((concert) {
+                              return buildImageWithText(
+                                concert['image'] ?? 'assets/default.jpg',
+                                concert['name'] ?? 'Concert Name',
+                                context, // ส่ง context ไปให้ function
+                                concert, // ส่งข้อมูล concert ไปด้วย
+                              );
+                            }).toList(),
                           ),
                         ),
 
@@ -411,8 +615,7 @@ class _HomeConcertState extends State<HomeConcert> {
                           ],
                         ),
 
-                        // Circle Avatars with Text
-                         SizedBox(height: 30),
+                        SizedBox(height: 30),
                         Container(
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
@@ -433,8 +636,12 @@ class _HomeConcertState extends State<HomeConcert> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Column(
-                            children: categoryItems[selectedCategory]!
-                                .map((item) => buildImageWithTextAndBox(item))
+                            children: (_isLoading
+                                    ? [] // ถ้ายังโหลดข้อมูลอยู่ ให้แสดงเป็นค่าว่าง
+                                    : categoryItems[selectedCategory] ??
+                                        []) // ใช้ข้อมูลจาก selectedCategory
+                                .map((item) => buildImageWithTextAndBox(
+                                    item)) // แปลงแต่ละ item เป็น widget
                                 .toList(),
                           ),
                         ),
@@ -495,46 +702,74 @@ class _HomeConcertState extends State<HomeConcert> {
     );
   }
 
-  Widget buildImageWithText(String imagePath, String text) {
+  Widget buildImageWithText(String imagePath, String text, BuildContext context,
+      Map<String, dynamic> concert) {
+    String imageUrl = 'http://192.168.55.228/concert/$imagePath';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Container(
-        width: 150,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: 150, // กำหนดความกว้างของรูปภาพ
-                height: 120, // กำหนดความสูงของรูปภาพ
-              ),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  ConcertDetailPage(concert: concert), // ไปที่หน้ารายละเอียด
             ),
-            SizedBox(height: 8), // เพิ่มพื้นที่ระหว่างรูปภาพและข้อความ
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+          );
+        },
+        child: Container(
+          width: 150,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Container(
+                  width: 150,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    image: DecorationImage(
+                      image: imageUrl.startsWith('http')
+                          ? NetworkImage(
+                              imageUrl) // ใช้ NetworkImage ถ้าเป็น URL
+                          : AssetImage(imageUrl)
+                              as ImageProvider, // ใช้ AssetImage ถ้าเป็น local file
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: 8), // เว้นระยะระหว่างรูปภาพและข้อความ
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget buildCarouselItem(String imagePath) {
+    String imageUrl = 'http://192.168.55.228/concert/$imagePath';
+
     return Container(
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(imagePath),
+          image: imageUrl.startsWith('http')
+              ? NetworkImage(imageUrl) // ถ้าเป็น URL ใช้ NetworkImage
+              : AssetImage(imageUrl)
+                  as ImageProvider, // ถ้าไม่ใช่ URL ใช้ AssetImage
           fit: BoxFit.cover,
         ),
         borderRadius: BorderRadius.circular(15.0),
@@ -572,20 +807,14 @@ class _HomeConcertState extends State<HomeConcert> {
   }
 
   Widget buildImageWithTextAndBox(Map<String, String> item) {
+    // กำหนด URL ของรูปภาพ
+    // แปลงวันที่ให้แสดงในรูปแบบ dd/MM/yyyy
+    String formattedDate = formatDate(item['text2']!);
+
+   String imageUrl = 'http://192.168.55.228/concert/all/' + item['imagePath']!;
+
+
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => ConcertDetail(
-              imagePath: item['imagePath']!,
-              text1: item['text1']!,
-              text2: item['text2']!,
-              text3: item['text3']!,
-              text4: item['text4']!,
-            ),
-          ),
-        );
-      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16.0),
         padding: const EdgeInsets.all(8.0),
@@ -595,15 +824,31 @@ class _HomeConcertState extends State<HomeConcert> {
         ),
         child: Row(
           children: [
-            // ClipRRect to apply rounded corners to the image
+            // ใช้ Image.network แทน NetworkImage
             ClipRRect(
-              borderRadius:
-                  BorderRadius.circular(10.0), // Adjust the radius as needed
-              child: Image.asset(
-                item['imagePath']!,
+              borderRadius: BorderRadius.circular(15),
+              child: Container(
                 width: 100,
                 height: 140,
-                fit: BoxFit.cover,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child; // ถ้าภาพโหลดเสร็จแล้ว ให้แสดงภาพเลย
+                    } else {
+                      // ถ้ายังโหลดไม่เสร็จ ให้แสดง CircularProgressIndicator
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  (loadingProgress.expectedTotalBytes ?? 1)
+                              : null,
+                        ),
+                      );
+                    }
+                  },
+                ),
               ),
             ),
             const SizedBox(width: 8.0),
@@ -612,7 +857,7 @@ class _HomeConcertState extends State<HomeConcert> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item['text1']!,
+                    item['text1']!, // ชื่อคอนเสิร์ต
                     style: TextStyle(
                       color: Color(int.parse(item['textColor']!)),
                       fontWeight: FontWeight.bold,
@@ -623,12 +868,11 @@ class _HomeConcertState extends State<HomeConcert> {
                     children: [
                       Icon(Icons.calendar_month_outlined,
                           size: 16, color: Colors.green),
-                      SizedBox(width: 4),
                       Text(
-                        item['text2']!,
+                        ' $formattedDate', // ใช้วันที่ที่แปลงแล้ว
                         style: TextStyle(
-                          color: Color(int.parse(item['textColor']!)),
-                          fontSize: 16,
+                          color: Colors.black,
+                          fontSize: 17,
                         ),
                       ),
                     ],
@@ -638,7 +882,7 @@ class _HomeConcertState extends State<HomeConcert> {
                       Icon(Icons.timer_sharp, size: 16, color: Colors.blue),
                       SizedBox(width: 4),
                       Text(
-                        item['text3']!,
+                        item['text3']!, // วัน
                         style: TextStyle(
                           color: Color(int.parse(item['textColor']!)),
                           fontSize: 16,
@@ -646,41 +890,52 @@ class _HomeConcertState extends State<HomeConcert> {
                       ),
                     ],
                   ),
+
                   Row(
                     children: [
-                      Icon(Icons.push_pin,
-                          size: 16, color: Colors.red),
+                      Icon(Icons.push_pin, size: 16, color: Colors.red),
                       SizedBox(width: 4),
-                      Text(
-                        item['text4']!,
-                        style: TextStyle(
-                          color: Color(int.parse(item['textColor']!)),
-                          fontSize: 16,
+                      Expanded(
+                        // ใช้ Expanded เพื่อให้ข้อความยืดออกไปได้
+                        child: Text(
+                          item['text4']!, // สถานที่
+                          style: TextStyle(
+                            color: Color(int.parse(item['textColor']!)),
+                            fontSize: 16,
+                          ),
+                          softWrap:
+                              true, // จะทำให้ข้อความขึ้นบรรทัดใหม่ถ้ายาวเกิน
                         ),
                       ),
                     ],
                   ),
+
                   SizedBox(height: 8),
                   // Add the 'Buy Tickets' button
                   ElevatedButton(
                     onPressed: () {
+                      // ตรวจสอบค่า
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => ConcertPlan(),
+                          builder: (context) => ConcertDetail(
+                            imagePath: imageUrl, // เปลี่ยนเป็น URL เต็ม
+                            text1: item['text1']!,
+                            text2: item['text2']!,
+                            text3: item['text3']!,
+                            text4: item['text4']!,
+                            text5: item['text5'] ?? 'ไม่มีข้อมูล',
+                          ),
                         ),
                       );
-
-                      // Action when the button is pressed
-                      // You can navigate to another screen or show a dialog
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: const Color.fromARGB(
-                          255, 255, 29, 13), // Background color
-                      onPrimary: Colors.white, // Text color
+                      backgroundColor: const Color.fromARGB(255, 255, 29, 13),
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      padding: EdgeInsets.symmetric(vertical: 5.0,horizontal: 25.0),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 5.0, horizontal: 25.0),
                     ),
                     child: Text(
                       'ซื้อบัตร',
@@ -698,4 +953,5 @@ class _HomeConcertState extends State<HomeConcert> {
       ),
     );
   }
+
 }

@@ -5,7 +5,8 @@ import 'package:project_new/navbar/message.dart';
 import 'package:http/http.dart' as http;
 
 class Recommantinformation extends StatefulWidget {
-  const Recommantinformation({Key? key}) : super(key: key);
+  const 
+  Recommantinformation({Key? key}) : super(key: key);
 
   @override
   State<Recommantinformation> createState() => _RecommantinformationState();

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class Discount extends StatefulWidget {
@@ -12,11 +14,16 @@ class _DiscountState extends State<Discount> {
   late ScrollController _scrollController;
   late Timer _timer;
   int _currentIndex = 0;
-  bool _isCouponClaimed = false; // New variable to track coupon state
+  bool _isCouponClaimed = false;
+  List<dynamic> _promotion = [];
+  List<dynamic> _promotionDetail = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    fetchPromotionImages();
+    fetchPromotionDetail();
     _scrollController = ScrollController();
 
     // Auto-scroll logic
@@ -32,6 +39,40 @@ class _DiscountState extends State<Discount> {
         curve: Curves.easeInOut,
       );
     });
+  }
+
+  Future<void> fetchPromotionImages() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://192.168.55.228:5000/getpromotionImage'));
+      if (response.statusCode == 200) {
+        setState(() {
+          _promotion = jsonDecode(response.body);
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
+  }
+
+  Future<void> fetchPromotionDetail() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://192.168.55.228:5000/getpromotionDetail'));
+      if (response.statusCode == 200) {
+        setState(() {
+          _promotionDetail = jsonDecode(response.body);
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
   }
 
   @override
@@ -87,11 +128,11 @@ class _DiscountState extends State<Discount> {
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     controller: _scrollController,
-                    children: [
-                      _buildFeaturedProduct('assets/pop2.jpg'),
-                      _buildFeaturedProduct('assets/pop1.jpg'),
-                      _buildFeaturedProduct('assets/pop3.jpg'),
-                    ],
+                    children: _promotion.map((promotion) {
+                      return _buildFeaturedProduct(
+                        promotion['image'] ?? 'assets/default.jpg',
+                      );
+                    }).toList(),
                   ),
                 ),
                 // Circular images with text for categories
@@ -250,7 +291,7 @@ class _DiscountState extends State<Discount> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '20% OFF', // ข้อความด้านบน
+                                        '15-50% OFF', // ข้อความด้านบน
                                         style: TextStyle(
                                           fontSize: 17,
                                           color: Colors.black,
@@ -258,7 +299,7 @@ class _DiscountState extends State<Discount> {
                                         ),
                                       ),
                                       Text(
-                                        'ซื้อครบ 49 บาท', // ข้อความด้านล่าง
+                                        'ซื้อครบ 50 บาท', // ข้อความด้านล่าง
                                         style: TextStyle(
                                           fontSize: 15,
                                           color: Colors.black54,
@@ -266,7 +307,7 @@ class _DiscountState extends State<Discount> {
                                         ),
                                       ),
                                       Text(
-                                        'ลดสูงสุด 150 บาท', // ข้อความด้านล่างสุด
+                                        'ลดสูงสุด 350 บาท', // ข้อความด้านล่างสุด
                                         style: TextStyle(
                                           fontSize: 15,
                                           color: Colors.black54,
@@ -312,7 +353,7 @@ class _DiscountState extends State<Discount> {
                                         color:
                                             Colors.white, // สีข้อความภายในกรอบ
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                        fontSize: 15,
                                       ),
                                     ),
                                   ),
@@ -327,22 +368,15 @@ class _DiscountState extends State<Discount> {
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                            children: [
-                              buildImageWithText('assets/baby.jpg', 'Product 1',
-                                  '\$30.00', '\$20.00'),
-                              buildImageWithText('assets/baby1.jpg',
-                                  'Product 2', '\$35.00', '\$25.00'),
-                              buildImageWithText('assets/baby2.jpg',
-                                  'Product 3', '\$40.00', '\$30.00'),
-                              buildImageWithText('assets/baby3.jpg',
-                                  'Product 4', '\$32.00', '\$22.00'),
-                              buildImageWithText('assets/baby4.jpg',
-                                  'Product 5', '\$38.00', '\$28.00'),
-                              buildImageWithText('assets/baby5.jpg',
-                                  'Product 6', '\$28.00', '\$18.00'),
-                              buildImageWithText('assets/baby6.jpg',
-                                  'Product 7', '\$25.00', '\$15.00'),
-                            ],
+                            children: _promotionDetail.map((promotionDetail) {
+                              return buildImageWithText(
+                                promotionDetail['image'] ??
+                                    'assets/default.jpg',
+                                promotionDetail['name'] ?? 'Unknown Name',
+                                promotionDetail['oldPrice'] ?? '\$0.00',
+                                promotionDetail['newPrice'] ?? '\$0.00',
+                              );
+                            }).toList(),
                           ),
                         ),
                       ],
@@ -389,7 +423,7 @@ class _DiscountState extends State<Discount> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'เติมคูปอง ทุกเที่ยงคืน 00.00 น.',
+                                    'โปรโมชันสำหรับลูกค้า INTERGETHER',
                                     style: TextStyle(
                                       fontSize: 17,
                                       color: Colors.black,
@@ -397,35 +431,6 @@ class _DiscountState extends State<Discount> {
                                     ),
                                   ),
                                 ],
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            child: GestureDetector(
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                    vertical: 5.0), // Padding ภายในกรอบ
-                                decoration: BoxDecoration(
-                                  color: Colors.pink,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey
-                                          .withOpacity(0.3), // เงาเบาๆ
-                                      spreadRadius: 1,
-                                      blurRadius: 5,
-                                      offset: Offset(0, 3), // เงาไปด้านล่าง
-                                    ),
-                                  ],
-                                ),
-                                child: Text(
-                                  'เงื่อนไขคูปอง',
-                                  style: TextStyle(
-                                    color: Colors.white, // สีข้อความภายในกรอบ
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
                               ),
                             ),
                           ),
@@ -537,22 +542,16 @@ class _DiscountState extends State<Discount> {
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
-                                children: [
-                                  buildImgWithText('assets/baby.jpg',
-                                      'Product 1', '\$30.00', '\$20.00'),
-                                  buildImgWithText('assets/baby1.jpg',
-                                      'Product 2', '\$35.00', '\$25.00'),
-                                  buildImgWithText('assets/baby2.jpg',
-                                      'Product 3', '\$40.00', '\$30.00'),
-                                  buildImgWithText('assets/baby3.jpg',
-                                      'Product 4', '\$32.00', '\$22.00'),
-                                  buildImgWithText('assets/baby4.jpg',
-                                      'Product 5', '\$38.00', '\$28.00'),
-                                  buildImgWithText('assets/baby5.jpg',
-                                      'Product 6', '\$28.00', '\$18.00'),
-                                  buildImgWithText('assets/baby6.jpg',
-                                      'Product 7', '\$25.00', '\$15.00'),
-                                ],
+                                children:
+                                    _promotionDetail.map((promotionDetail) {
+                                  return buildImgWithText(
+                                    promotionDetail['image'] ??
+                                        'assets/default.jpg',
+                                    promotionDetail['name'] ?? 'Unknown Name',
+                                    promotionDetail['oldPrice'] ?? '\$0.00',
+                                    promotionDetail['newPrice'] ?? '\$0.00',
+                                  );
+                                }).toList(),
                               ),
                             ),
                           ],
@@ -597,6 +596,8 @@ class _DiscountState extends State<Discount> {
 
   Widget buildImageWithText(String imagePath, String productName,
       String originalPrice, String newPrice) {
+    String imageUrl = 'http://192.168.55.228/promotion/$imagePath';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Container(
@@ -619,11 +620,19 @@ class _DiscountState extends State<Discount> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: 150, // Set width for the image
-                height: 120, // Set height for the image
+              child: Container(
+                width: 200,
+                height: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  image: DecorationImage(
+                    image: imageUrl.startsWith('http')
+                        ? NetworkImage(imageUrl) // ถ้าเป็น URL ใช้ NetworkImage
+                        : AssetImage(imageUrl)
+                            as ImageProvider, // ถ้าไม่ใช่ URL ใช้ AssetImage
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 5), // Space between image and text
@@ -696,10 +705,9 @@ class _DiscountState extends State<Discount> {
     );
   }
 
-
-
   Widget buildImgWithText(String imagePath, String productName,
       String originalPrice, String newPrice) {
+    String imageUrl = 'http://192.168.55.228/promotion/$imagePath';
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Container(
@@ -722,11 +730,19 @@ class _DiscountState extends State<Discount> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: 150, // Set width for the image
-                height: 125, // Set height for the image
+              child: Container(
+                width: 200,
+                height: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  image: DecorationImage(
+                    image: imageUrl.startsWith('http')
+                        ? NetworkImage(imageUrl) // ถ้าเป็น URL ใช้ NetworkImage
+                        : AssetImage(imageUrl)
+                            as ImageProvider, // ถ้าไม่ใช่ URL ใช้ AssetImage
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 5), // Space between image and text
@@ -800,18 +816,12 @@ class _DiscountState extends State<Discount> {
     );
   }
 
-
-
-
-
-
-
-
   Widget _buildFeaturedProduct(String imagePath) {
+    String imageUrl = 'http://192.168.55.228/promotion/$imagePath';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Container(
-        width: 370,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
@@ -827,10 +837,18 @@ class _DiscountState extends State<Discount> {
           borderRadius: BorderRadius.circular(15),
           child: Stack(
             children: [
-              Positioned.fill(
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
+              Container(
+                width: 370,
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  image: DecorationImage(
+                    image: imageUrl.startsWith('http')
+                        ? NetworkImage(imageUrl) // ถ้าเป็น URL ใช้ NetworkImage
+                        : AssetImage(imageUrl)
+                            as ImageProvider, // ถ้าไม่ใช่ URL ใช้ AssetImage
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ],

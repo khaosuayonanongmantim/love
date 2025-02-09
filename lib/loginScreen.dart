@@ -85,46 +85,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 }
-//   final String apiUrl = "http://172.18.114.161/LoveProject/login.php"; // URL ไฟล์ PHP
-//   try {
-//     final response = await http.post(
-//       Uri.parse(apiUrl),
-//       body: {
-//         "email": _emailController.text,
-//         "password": _passwordController.text,
-//       },
-//     );
-
-//     final data = json.decode(response.body);
-// print("Response Body: ${response.body}");
-//     if (data['status'] == "success") {
-//       // หากเข้าสู่ระบบสำเร็จ
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text("Welcome, ${data['data']['first_name']}")),
-//       );
-//       print("Login Successful: ${data['data']}");
-
-//       // เปลี่ยนหน้าไปยัง BottomNavBar
-//       Navigator.pushReplacement(
-//         context,
-//         MaterialPageRoute(builder: (context) => BottomNavbar()), // เปลี่ยนเป็นหน้าของคุณ
-//       );
-//     } else {
-//       // หากเกิดข้อผิดพลาด
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(data['message'])),
-//       );
-//     }
-//   } catch (e) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(content: Text("Error: Unable to connect to the server")),
-//     );
-//   } finally {
-//     setState(() {
-//       _isLoading = false;
-//     });
-//   }
-// }
 
   @override
   Widget build(BuildContext context) {
