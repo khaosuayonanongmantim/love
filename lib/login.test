@@ -1,201 +1,420 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:project_new/navbar/discount.dart';
+import 'package:project_new/navbar/product.dart';
+import 'package:http/http.dart' as http;
 
-class RegScreen extends StatefulWidget {
-  const RegScreen({Key? key}) : super(key: key);
+class Recommantpromotion extends StatefulWidget {
+  const Recommantpromotion({Key? key}) : super(key: key);
 
-  @override
-  State<RegScreen> createState() => _RegScreenState();
+  State<Recommantpromotion> createState() => _RecommantpromotionState();
 }
 
-class _RegScreenState extends State<RegScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-
-  bool _isLoading = false;
-
-  // ฟังก์ชันสำหรับการสมัครสมาชิก
-  Future<void> _register() async {
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final uri = Uri.parse("http://192.168.66.228/LoveProject/register.php"); // เปลี่ยน IP Address ตามจริง
-      final response = await http.post(
-        uri,
-        body: {
-          'first_name': _nameController.text,
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        },
-      );
-
-      final data = json.decode(response.body);
-
-      if (data['status'] == "success") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'])),
-        );
-        Navigator.pop(context); // ย้อนกลับไปหน้า Sign In
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'])),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error connecting to server')),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+class _RecommantpromotionState extends State<Recommantpromotion> {
+  List<dynamic> _lightstickcon = [];
+  bool _isLoading = true;
+  
+   @override
+  void initState() {
+    super.initState();
+    fetchLightstick();
   }
 
+Future<void> fetchLightstick() async {
+  try {
+    final response = await http.get(Uri.parse('http://192.168.55.228:5000/getAllligthstickcon'));
+    if (response.statusCode == 200) {
+      setState(() {
+        _lightstickcon = jsonDecode(response.body); // แปลง JSON เป็น List
+        _isLoading = false;
+      });
+    } else {
+      print('Failed to load events: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error fetching events: $e');
+  }
+}
+
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background Gradient
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(colors: [
-                Color.fromARGB(255, 103, 102, 175),
-                Color.fromARGB(255, 158, 221, 232),
-              ]),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(height: 30),
+        Container(
+          padding: const EdgeInsets.all(8),
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 149, 164, 216),
+            border: Border.all(
+              color: Colors.white,
+              width: 2.0,
             ),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 60.0, left: 22),
-              child: Text(
-                'Create Your\nAccount',
-                style: TextStyle(
-                  fontSize: 36,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black38,
-                      offset: Offset(2, 2),
-                      blurRadius: 5,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 247, 200, 255),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color.fromARGB(255, 126, 39, 176),
+                    width: 2.0,
+                  ),
+                ),
+                child: Text(
+                  "👜 Our Exclusive Products🧸",
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 145, 64, 251),
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+
+                const SizedBox(height: 10),
+              _isLoading
+                  ? CircularProgressIndicator() // แสดง spinner ระหว่างรอข้อมูล
+                  : GridView.builder(
+                      shrinkWrap: true, // ใช้สำหรับแสดงรายการแบบย่อ
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // กำหนดให้มี 2 กรอบในแถว
+                        crossAxisSpacing: 10, // ระยะห่างระหว่างกรอบในแถว
+                        mainAxisSpacing: 10, // ระยะห่างระหว่างแถว
+                        childAspectRatio: 0.7, // อัตราส่วนความกว้าง/ความสูงของกรอบ
+                      ),
+                      itemCount: _lightstickcon.length, // จำนวนรายการ
+                      itemBuilder: (context, index) {
+                        var event = _lightstickcon[index]; // ข้อมูลแต่ละรายการ
+                        String imageUrl = 'http://192.168.55.228/product/lightstick/${event['image']}';
+                        
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Color.fromARGB(255, 2, 90, 161),
+                              width: 2.0,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              // แสดงรูปภาพจาก URL
+                              Image.network(
+                                imageUrl, // แสดงรูปภาพจาก URL
+                                height: 115, // ขนาดรูปภาพที่เล็กลง
+                                width: double.infinity, // ความกว้างของรูปภาพ
+                                fit: BoxFit.cover, // การปรับขนาดรูปภาพ
+                              ),
+                              SizedBox(height: 10),
+                              // ข้อความ Title
+                              Text(
+                                event['name'], // ใช้ข้อมูลจาก API (เปลี่ยนให้ตรงกับโครงสร้าง API)
+                                style: TextStyle(
+                                  fontSize: 14, // ขนาดข้อความเล็กลง
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              // ข้อความ Text
+                              Text(
+                                event['price'], // ข้อความจาก API (เปลี่ยนให้ตรงกับโครงสร้าง API)
+                                style: TextStyle(
+                                  fontSize: 14, // ขนาดข้อความเล็กลง
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+              
+              
+              SizedBox(height: 10),
+
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Product(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  width: 150,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 240, 171, 186), // ชมพูอ่อน
+                        Color.fromARGB(255, 241, 207, 155), // ส้มอ่อน
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "GO TO NEXT PAGE",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        //page promotion
+        SizedBox(height: 30),
+        Container(
+          padding: const EdgeInsets.all(8),
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 177, 228, 221),
+            border: Border.all(
+              color: Colors.white,
+              width: 2.0,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                margin:
+                    const EdgeInsets.only(bottom: 10), // ระยะห่างระหว่างกรอบ
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 200, 255, 227),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Color.fromARGB(255, 23, 139, 72),
+                    width: 2.0,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "✨Exclusive Promotion🌟",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
               ),
+
+              // Container 1 with Image
+              Container(
+                padding: const EdgeInsets.all(8),
+                margin:
+                    const EdgeInsets.only(bottom: 10), // ระยะห่างระหว่างกรอบ
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 255, 228, 245),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "Special Offer",
+                      style: TextStyle(
+                        color: Colors.pink,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Image.asset(
+                      'assets/pop1.jpg',
+                      width: 400, // ขยายความกว้าง
+                      height: 150, // ขยายความสูง
+                      fit: BoxFit.cover, // ปรับขนาดภาพให้เต็มกรอบ
+                    ),
+                  ],
+                ),
+              ),
+
+              // Container 2 with Image
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 200, 249, 255),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "50% Off!",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Image.asset(
+                      'assets/pop2.jpg',
+                      width: 400, // ขยายความกว้าง
+                      height: 150, // ขยายความสูง
+                      fit: BoxFit.cover, // ปรับขนาดภาพให้เต็มกรอบ
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 10),
+
+              // Container 3 with Image
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 255, 222, 200),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "Buy 1 Get 1!",
+                      style: TextStyle(
+                        color: Colors.red,
+                        
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Image.asset(
+                      'assets/pop3.jpg',
+                      width: 400, // ขยายความกว้าง
+                      height: 150, // ขยายความสูง
+                      fit: BoxFit.cover, // ปรับขนาดภาพให้เต็มกรอบ
+                      
+                      
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              // ปุ่มสำหรับการนำทาง
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Discount(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  width: 150,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 255, 148, 86), // ชมพูอ่อน
+                        Color.fromARGB(255, 255, 210, 85), // ส้มอ่อน
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "GO TO NEXT PAGE",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+         SizedBox(height: 20),
+      ],
+    );
+  }
+
+  // ฟังก์ชันเพื่อสร้างกรอบผลิตภัณฑ์
+  Widget buildProductCard(String imagePath, String title, String description) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Colors.grey,
+          width: 2.0,
+        ),
+      ),
+      child: Column(
+        children: [
+          Image.asset(
+            imagePath,
+            height: 100,
+            width: 100,
+            fit: BoxFit.cover,
+          ),
+          SizedBox(height: 8),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
           ),
-          // Main Registration Container
-          Padding(
-            padding: const EdgeInsets.only(top: 200.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
-                ),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey,
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
+          SizedBox(height: 4),
+          Text(
+            description,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 5),
+          ElevatedButton(
+            onPressed: () {
+              // เพิ่มโค้ดฟังก์ชันการทำงานของปุ่ม Buy Now ที่นี่
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Color.fromARGB(255, 247, 186, 150), // สีพื้นหลังปุ่ม
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
-              height: double.infinity,
-              width: double.infinity,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Full Name Input Field
-                    TextField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Full Name',
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 157, 23, 184),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Email Input Field
-                    TextField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 157, 23, 184),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Password Input Field
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Password',
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 157, 23, 184),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Confirm Password Input Field
-                    TextField(
-                      controller: _confirmPasswordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Confirm Password',
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 157, 23, 184),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    // Sign Up Button
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _register,
-                      style: ElevatedButton.styleFrom(
-                        primary: const Color.fromARGB(255, 164, 60, 244),
-                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              "SIGN UP",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                  ],
-                ),
+            ),
+            child: Text(
+              "BUY NOW",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

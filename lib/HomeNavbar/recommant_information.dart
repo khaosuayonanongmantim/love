@@ -1,15 +1,44 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:project_new/HomeNavbar/recomment_product.dart';
 import 'package:project_new/navbar/message.dart';
+import 'package:http/http.dart' as http;
 
 class Recommantinformation extends StatefulWidget {
-  const Recommantinformation({Key? key}) : super(key: key);
+  const 
+  Recommantinformation({Key? key}) : super(key: key);
 
   @override
   State<Recommantinformation> createState() => _RecommantinformationState();
 }
 
 class _RecommantinformationState extends State<Recommantinformation> {
+  List<dynamic> _eventPoster = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEventposter();
+  }
+
+  Future<void> fetchEventposter() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://192.168.55.228:5000/getEventPoster'));
+      if (response.statusCode == 200) {
+        setState(() {
+          _eventPoster = jsonDecode(response.body); // แปลง JSON เป็น List
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load events: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching events: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -17,30 +46,27 @@ class _RecommantinformationState extends State<Recommantinformation> {
       children: [
         SizedBox(height: 30),
         Container(
-          padding: const EdgeInsets.all(8), // ระยะห่างภายในกรอบ
-          margin: const EdgeInsets.symmetric(horizontal: 16), // ระยะห่างรอบกรอบ
+          padding: const EdgeInsets.all(8),
+          margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 185, 125, 197), // สีพื้นหลัง
+            color: Color.fromARGB(255, 185, 125, 197),
             border: Border.all(
-              color: Colors.white, // สีกรอบด้านนอก
-              width: 2.0, // ความหนาของกรอบด้านนอก
+              color: Colors.white,
+              width: 2.0,
             ),
-            borderRadius: BorderRadius.circular(8), // มุมโค้งของกรอบด้านนอก
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // กรอบข้อความ "Upcoming Sports Events"
               Container(
-                padding: const EdgeInsets.all(8), // ระยะห่างภายในกรอบข้อความ
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(
-                      255, 247, 200, 255), // สีพื้นหลังกรอบข้อความ
-                  borderRadius:
-                      BorderRadius.circular(8), // มุมโค้งของกรอบข้อความ
+                  color: Color.fromARGB(255, 247, 200, 255),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: Colors.purple, // สีกรอบข้อความ
-                    width: 2.0, // ความหนาของกรอบข้อความ
+                    color: Colors.purple,
+                    width: 2.0,
                   ),
                 ),
                 child: Text(
@@ -53,200 +79,100 @@ class _RecommantinformationState extends State<Recommantinformation> {
                 ),
               ),
               const SizedBox(height: 10),
-
-              // กรอบย่อยในกรอบหลัก
-              Container(
-                padding: const EdgeInsets.all(10), // ระยะห่างภายในกรอบภายใน
-                width: double.infinity, // ทำให้กรอบภายในกว้างสุดเท่าที่จะทำได้
-                decoration: BoxDecoration(
-                  color: Colors.white, // สีพื้นหลังสำหรับกรอบภายใน
-                  borderRadius: BorderRadius.circular(8), // มุมโค้งของกรอบภายใน
-                  border: Border.all(
-                    color: Color.fromARGB(255, 2, 90, 161), // สีกรอบภายใน
-                    width: 2.0, // ความหนาของกรอบภายใน
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // กรอบย่อย 1
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          width: 150,
+              _isLoading
+                  ? CircularProgressIndicator() // แสดง spinner ระหว่างรอข้อมูล
+                  : GridView.builder(
+                      shrinkWrap: true, // ใช้สำหรับแสดงรายการแบบย่อ
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // กำหนดให้มี 2 กรอบในแถว
+                        crossAxisSpacing: 10, // ระยะห่างระหว่างกรอบในแถว
+                        mainAxisSpacing: 10, // ระยะห่างระหว่างแถว
+                        childAspectRatio: 0.7, // อัตราส่วนความกว้าง/ความสูงของกรอบ
+                      ),
+                      itemCount: _eventPoster.length, // จำนวนรายการ
+                      itemBuilder: (context, index) {
+                        var event = _eventPoster[index]; // ข้อมูลแต่ละรายการ
+                        String imageUrl = 'http://192.168.55.228/information/${event['image']}';
+                        
+                        return Container(
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 204, 203, 203),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Color.fromARGB(255, 2, 90, 161),
+                              width: 2.0,
+                            ),
                           ),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                "Page 1: Introduction",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ), // เปลี่ยนเป็นสีฟ้า
+                              // แสดงรูปภาพจาก URL
+                              Image.network(
+                                imageUrl, // แสดงรูปภาพจาก URL
+                                height: 112, // ขนาดรูปภาพที่เล็กลง
+                                width: double.infinity, // ความกว้างของรูปภาพ
+                                fit: BoxFit.cover, // การปรับขนาดรูปภาพ
                               ),
-                              SizedBox(
-                                  height:
-                                      5), // ระยะห่างระหว่างข้อความหลักและข้อความรอง
-
+                              SizedBox(height: 10),
+                              // ข้อความ Title
                               Text(
-                                "Welcome to the Virtual Book for Sports Events! ", // ข้อความใต้
+                                event['title'], // ใช้ข้อมูลจาก API (เปลี่ยนให้ตรงกับโครงสร้าง API)
                                 style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ), // ข้อความสีดำ
-                              ),
-                            ],
-                          ),
-                        ),
-                        // กรอบย่อย 2
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 204, 203, 203),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Page 2: SportsEvent",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 16,
+                                  fontSize: 14, // ขนาดข้อความเล็กลง
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               SizedBox(height: 5),
+                              // ข้อความ Text
                               Text(
-                                "Details about the first sports event experience.",
+                                event['text'], // ข้อความจาก API (เปลี่ยนให้ตรงกับโครงสร้าง API)
                                 style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10, // ขนาดข้อความเล็กลง
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10), // ระยะห่างระหว่างแถว
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // กรอบย่อย 3
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 204, 203, 203),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Page 3: SportsEvent",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                "Learn about the second exciting sports event.",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // กรอบย่อย 4
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 204, 203, 203),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Page 4: Introduction",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                "Get ready for the third major sports event.to miss!",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 10), // ระยะห่างระหว่างแถว
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                Message(), // เปลี่ยน NextPage เป็นชื่อหน้าที่ต้องการจะนำทางไป
                           ),
                         );
                       },
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        width: 150,
-                        decoration: BoxDecoration(
-                          color: Colors.pink,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              "GO TO NEXT PAGE",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                    ),
+              
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Message(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  width: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.pink,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "GO TO NEXT PAGE",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
         ),
         Recommantpromotion(),
-     ],
+      ],
     );
   }
 }

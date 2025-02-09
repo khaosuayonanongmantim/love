@@ -1,371 +1,180 @@
+import 'dart:convert';
+import 'dart:async'; // Import dart:async for Timer
 import 'package:flutter/material.dart';
-import 'package:project_new/HomeNavbar/recommant_information.dart';
+import 'package:project_new/HomeNavbar/concert_enjoy.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'concert_detail.dart'; // Import the ConcertDetail widget
+import 'package:http/http.dart' as http;
 
-class RecommendedHome extends StatefulWidget {
-  const RecommendedHome({Key? key}) : super(key: key);
+class HomeConcert extends StatefulWidget {
+  const HomeConcert({super.key});
 
   @override
-  State<RecommendedHome> createState() => _RecommendedHomeState();
+  State<HomeConcert> createState() => _HomeConcertState();
 }
 
-class _RecommendedHomeState extends State<RecommendedHome> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
+class _HomeConcertState extends State<HomeConcert> {
+  List<dynamic> _concerts = [];
+  int selectedIndex = 0; // Store the selected index
+  String selectedCategory = 'ทั้งหมด'; // Track the selected category
+  bool _isLoading = true;
 
-  void _nextPage() {
-    if (_currentPage < 2) {
-      _currentPage++;
-      _pageController.animateToPage(
-        _currentPage,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
+  // Define the items for each category
+
+  @override
+  void initState() {
+    super.initState();
+    fetchConcerts();
   }
 
-    void _previousPage() {
-    if (_currentPage > 0) {
-      _currentPage--;
-      _pageController.animateToPage(
-        _currentPage,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+ var categoryItems = {
+  'ทั้งหมด': [],
+  'THAI MASS': [],
+  'T-POP': [],
+  'K-POP': [],
+  'INTERNATIONAL': [],
+};
+
+Future<void> fetchConcerts() async {
+  try {
+    final response = await http.get(Uri.parse('http://192.168.55.228:5000/getAllConcerts'));
+    if (response.statusCode == 200) {
+      List<dynamic> concerts = jsonDecode(response.body);
+      
+      // แปลงข้อมูลจาก API ให้อยู่ในรูปแบบ categoryItems
+      Map<String, List<Map<String, String>>> updatedCategories = {
+        'ทั้งหมด': [],
+        'THAI MASS': [],
+        'T-POP': [],
+        'K-POP': [],
+        'INTERNATIONAL': [],
+      };
+
+      for (var concert in concerts) {
+        String category = concert['category'] ?? 'ทั้งหมด';
+        if (!updatedCategories.containsKey(category)) {
+          updatedCategories[category] = [];
+        }
+
+        updatedCategories[category]!.add({
+          'imagePath': concert['image'] ?? 'assets/default.jpg',
+          'text1': concert['name'] ?? 'Unknown Concert',
+          'text2': concert['date'] ?? 'Unknown Date',
+          'text3': concert['time'] ?? 'Unknown Time',
+          'text4': concert['location'] ?? 'Unknown Location',
+          'boxColor': '0xFFFFFFFF',
+          'textColor': '0xFF000000',
+        });
+      }
+
+      setState(() {
+  // รวมข้อมูลของ API นี้เข้ากับ categoryItems เดิม
+  categoryItems.forEach((key, value) {
+    if (updatedCategories.containsKey(key)) {
+      categoryItems[key]!.addAll(updatedCategories[key]!);
     }
+  });
+  _concerts = concerts;
+  _isLoading = false;
+});
+    } else {
+      print('Failed to load concerts: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error fetching concerts: $e');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // ส่วนของการแนะนำสำหรับคุณ
-        SizedBox(height: 30),
-        Container(
-          padding: const EdgeInsets.all(5), // ระยะห่างภายในกรอบ
-          margin: const EdgeInsets.symmetric(horizontal: 16), // ระยะห่างรอบกรอบ
-          decoration: BoxDecoration(
-            color: Color.fromARGB(255, 126, 198, 207), // สีพื้นหลัง (ปรับตามต้องการ)
-            border: Border.all(
-              color: Colors.white, // สีของกรอบ
-              width: 2.0, // ความหนาของกรอบ
-
-            ),
-            borderRadius: BorderRadius.circular(8), // มุมโค้งของกรอบ
-          ),
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.center, // จัดแนวข้อความทางด้านซ้าย
-            children: [
-              // กรอบข้อความ "Upcoming Concerts"
-              Container(
-                padding: const EdgeInsets.all(8), // ระยะห่างภายในกรอบข้อความ
-                decoration: BoxDecoration(
-                  
-                  color: const Color.fromARGB(
-                      255, 219, 235, 248), // สีพื้นหลังกรอบข้อความ
-                  borderRadius:
-                      BorderRadius.circular(8), // มุมโค้งของกรอบข้อความ
-                  border: Border.all(
-                    color: Colors.blue, // สีของกรอบ
-                    width: 2.0, // ความหนาของกรอบ
-                  ),
-                ),
-                child: Text(
-                  "🎤 Upcoming Concerts 🎶",
-                  style: TextStyle(
-                    color: Colors.blueAccent,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(height: 8), // เพิ่มระยะห่างระหว่างข้อความและ ScrollView
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    buildVerticalImageWithText(
-                      'assets/chang.jpg',
-                      '"Concert 2"',
-                      'December 5, 2024',
-                      '15.00 น.-22.00 น.',
-                      'Impact Arena เมืองทอง',
-                    ),
-                    buildVerticalImageWithText(
-                      'assets/piano.jpg',
-                      '"Concert 1"',
-                      'November 20, 2024',
-                      '15.00 น.-22.00 น.',
-                      'สนามราชมังคลา',
-                    ),
-                    buildVerticalImageWithText(
-                      'assets/cat.jpg',
-                      '"Concert 1"',
-                      'November 20, 2024',
-                      '15.00 น.-22.00 น.',
-                      'สนามราชมังคลา',
-                    ),
-                    buildVerticalImageWithText(
-                      'assets/cocktail.jpg',
-                      '"Concert 1"',
-                      'November 20, 2024',
-                      '15.00 น.-22.00 น.',
-                      'สนามราชมังคลา',
-                    ),
-                    buildVerticalImageWithText(
-                      'assets/kini.png',
-                      '"Concert 1"',
-                      'November 20, 2024',
-                      '15.00 น.-22.00 น.',
-                      'สนามราชมังคลา',
-                    ),
-                    buildVerticalImageWithText(
-                      'assets/scrub.jpg',
-                      '"Concert 1"',
-                      'November 20, 2024',
-                      '15.00 น.-22.00 น.',
-                      'สนามราชมังคลา',
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        // การแสดงยอดนิยม
-        SizedBox(height: 30),
-        Container(
-          padding: const EdgeInsets.all(5), // ระยะห่างภายในกรอบ
-          margin: const EdgeInsets.symmetric(horizontal: 16), // ระยะห่างรอบกรอบ
-          decoration: BoxDecoration(
-            color: Color.fromARGB(255, 233, 106, 148), // สีพื้นหลัง (ปรับตามต้องการ)
-            border: Border.all(
-              color: Colors.white, // สีของกรอบ
-              width: 2.0, // ความหนาของกรอบ
-            ),
-            borderRadius: BorderRadius.circular(8), // มุมโค้งของกรอบ
-          ),
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.center, // จัดแนวข้อความทางด้านซ้าย
-            children: [
-              // กรอบข้อความ "Upcoming Sports Events"
-              Container(
-                padding: const EdgeInsets.all(8), // ระยะห่างภายในกรอบข้อความ
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(
-                      255, 250, 219, 229), // สีพื้นหลังกรอบข้อความ
-                  borderRadius:
-                      BorderRadius.circular(8), // มุมโค้งของกรอบข้อความ
-                  border: Border.all(
-                    color: Colors.pink, // สีของกรอบ
-                    width: 2.0, // ความหนาของกรอบ
-                  ),
-                ),
-                child: Text(
-                  "🏆 Upcoming Sports Events ⚽",
-                  style: TextStyle(
-                    color: Colors.pink,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(
-                  height: 8), // เพิ่มระยะห่างระหว่างกรอบข้อความและ ScrollView
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    buildImageWithText('assets/sport6.jpg'),
-                    buildImageWithText('assets/sport2.jpg'),
-                    buildImageWithText('assets/sport3.jpg'),
-                    buildImageWithText('assets/sport1.jpg'),
-                  ],
-                ),
-              ),
-                 // รูปภาพยาวแนวนอนใต้ส่วนของ Sports Events
-              SizedBox(height: 10),
-              Column(
-                children: [
-                  Container(
-          height: 170, // ความสูงของรูปภาพ
-          margin: const EdgeInsets.symmetric(horizontal: 16), // ระยะห่างรอบกรอบ
-          child: Stack(
-            children: [
-              PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                children: [
-                  buildImageContainer('assets/sport5.jpg'),
-                  buildImageContainer('assets/sport6.jpg'),
-                  buildImageContainer('assets/sport2.jpg'),
-                ],
-              ),
-              Positioned(
-                left: -10,
-                top: 70, // ปรับตำแหน่งตามต้องการ
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios, color: Color.fromARGB(255, 255, 0, 191)),
-                  onPressed: _previousPage,
-                  
-                ),
-              ),
-              Positioned(
-                right: -15,
-                top: 70, // ปรับตำแหน่งตามต้องการ
-                child: IconButton(
-                  icon: Icon(Icons.arrow_forward_ios, color: Color.fromARGB(255, 255, 0, 191)),
-                  onPressed: _nextPage,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-                
-              ),
-            
-            ],
-          ),
-        ),
-        // การกีฬายอดเยี่ยม
-        Recommantinformation(),
-      ],
-    );
-  }
-
-  Widget buildVerticalImageWithText(
-    String imagePath,
-    String title,
-    String date,
-    String time,
-    String location,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: 250,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 2),
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.transparent,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 250,
-              height: 200, // Adjusted height for the image
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                image: DecorationImage(
-                  image: AssetImage(imagePath),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            SizedBox(height: 8),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 241, 239, 239),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.purple,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_month_outlined,
-                        color: Color.fromARGB(255, 5, 255, 13),
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        date,
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 5, 255, 13),
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.timer_sharp,
-                        color: Color.fromARGB(255, 5, 255, 13),
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        time,
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 5, 255, 13),
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_rounded,
-                        color: Color.fromARGB(255, 8, 214, 241),
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        location,
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 8, 214, 241),
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // เกี่ยวกับส่วนของสถานที่บันเทิง
-  Widget buildImageWithText(
-    String imagePath,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+    return Scaffold(
+      body: Stack(
         children: [
+          // Background Gradient
           Container(
-            width: 170,
-            height: 200,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              image: DecorationImage(
-                image: AssetImage(imagePath),
-                fit: BoxFit.cover,
+            height: double.infinity,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 238, 163, 192),
+                  Color(0xFFEF629F),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          // Page Content
+          Padding(
+            padding: const EdgeInsets.only(top: 60.0),
+            child: SingleChildScrollView(
+              // Add this to enable scrolling
+              child: Column(
+                children: [
+                  // Header with Text and Back Icon
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                       
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                 
+                  const SizedBox(height: 20),
+                  // Content Box with Carousel
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 252, 186, 232),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(40),
+                        topRight: Radius.circular(40),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 30),
+                        Container(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                buildCircleAvatar('ทั้งหมด', 0),
+                                buildCircleAvatar('THAI MASS', 1),
+                                buildCircleAvatar('T-POP', 2),
+                                buildCircleAvatar('K-POP', 3),
+                                buildCircleAvatar('INTERNATIONAL', 4),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        // Content List
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Column(
+                            children: (_isLoading
+                                    ? []
+                                    : categoryItems[selectedCategory] ?? [])
+                                .map((item) => buildImageWithTextAndBox(item))
+                                .toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -374,122 +183,187 @@ class _RecommendedHomeState extends State<RecommendedHome> {
     );
   }
 
-    Widget buildImageContainer(String imagePath) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        image: DecorationImage(
-          image: AssetImage(imagePath),
-          fit: BoxFit.cover,
+  Widget buildCircleAvatar(String text, int index) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedCategory = text;
+          selectedIndex = index;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 6.0),
+        decoration: BoxDecoration(
+          color: selectedIndex == index
+              ? Colors.pink.withOpacity(0.2)
+              : Colors.white, // พื้นหลังของกรอบ
+          borderRadius: BorderRadius.circular(30), // มุมโค้งมน
+          border: Border.all(
+            color: selectedIndex == index
+                ? Colors.white
+                : Colors.white, // สีของกรอบ
+            width: 2,
+          ),
+        ),
+        width: 130, // ปรับความกว้างของกรอบ
+        height: 40, // ปรับความสูงของกรอบ
+        child: Center(
+          // จัดตำแหน่งข้อความให้อยู่กลาง
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Text
+              Text(
+                text,
+                style: TextStyle(
+                  color: selectedIndex == index ? Colors.pink : Colors.black,
+                  fontSize: 16, // ปรับขนาดตัวอักษร
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
+Widget buildImageWithTextAndBox(Map<String, String> item) {
+  // กำหนด URL ของรูปภาพ
+  String imageUrl = 'http://192.168.55.228/concert/all/' + item['imagePath']!;
 
-
-  Widget buildVerticalImageWithText(
-    String imagePath,
-    String title,
-    String date,
-    String time,
-    String location,
-  ) {
-    return Padding(
+  return GestureDetector(
+    child: Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: 250,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 2),
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.transparent,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 250,
-              height: 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                image: DecorationImage(
-                  image: imagePath.startsWith('http')
-                      ? NetworkImage(imagePath)
-                      : AssetImage(imagePath) as ImageProvider,
-                  fit: BoxFit.cover,
-                ),
+      decoration: BoxDecoration(
+        color: Color(int.parse(item['boxColor']!)),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Row(
+        children: [
+          // ใช้ Image.network แทน NetworkImage
+          ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Container(
+              width: 100,
+              height: 140,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child; // ถ้าภาพโหลดเสร็จแล้ว ให้แสดงภาพเลย
+                  } else {
+                    // ถ้ายังโหลดไม่เสร็จ ให้แสดง CircularProgressIndicator
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    );
+                  }
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  // ถ้าโหลดภาพไม่สำเร็จ ให้แสดงข้อความ "ไม่สามารถโหลดรูปภาพ"
+                  return Center(child: Text("ไม่สามารถโหลดรูปภาพ"));
+                },
               ),
             ),
-            SizedBox(height: 8),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 241, 239, 239),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
+          ),
+          const SizedBox(width: 8.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item['text1']!, // ชื่อคอนเสิร์ต
+                  style: TextStyle(
+                    color: Color(int.parse(item['textColor']!)),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.calendar_month_outlined,
+                        size: 16, color: Colors.green),
+                    SizedBox(width: 4),
+                    Text(
+                      item['text2']!, // วัน
+                      style: TextStyle(
+                        color: Color(int.parse(item['textColor']!)),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.timer_sharp, size: 16, color: Colors.blue),
+                    SizedBox(width: 4),
+                    Text(
+                      item['text3']!, // เวลา
+                      style: TextStyle(
+                        color: Color(int.parse(item['textColor']!)),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.push_pin, size: 16, color: Colors.red),
+                    SizedBox(width: 4),
+                    Text(
+                      item['text4']!, // สถานที่
+                      style: TextStyle(
+                        color: Color(int.parse(item['textColor']!)),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                // Add the 'Buy Tickets' button
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ConcertDetail(
+                          imagePath: item['imagePath']!,
+                          text1: item['text1']!,
+                          text2: item['text2']!,
+                          text3: item['text3']!,
+                          text4: item['text4']!,
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 255, 29, 13), 
+                    foregroundColor: Colors.white, 
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 25.0),
+                  ),
+                  child: Text(
+                    'ซื้อบัตร',
                     style: TextStyle(
-                      color: Colors.purple,
-                      fontSize: 20,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(Icons.calendar_month_outlined,
-                          color: Color.fromARGB(255, 5, 255, 13)),
-                      SizedBox(width: 8),
-                      Text(
-                        date,
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 5, 255, 13),
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Icon(Icons.timer_sharp,
-                          color: Color.fromARGB(255, 5, 255, 13)),
-                      SizedBox(width: 8),
-                      Text(
-                        time,
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 5, 255, 13),
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Icon(Icons.location_on_rounded,
-                          color: Color.fromARGB(255, 8, 214, 241)),
-                      SizedBox(width: 8),
-                      Text(
-                        location,
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 8, 214, 241),
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+}
