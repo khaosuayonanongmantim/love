@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:project_new/Payment/PaymentProductPage.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Product extends StatefulWidget {
   const Product({super.key});
@@ -13,16 +15,27 @@ class _ProductState extends State<Product> {
   late ScrollController _scrollController;
   late Timer _timer;
   int _currentIndex = 0;
-  String selectedCategory = 'ALL'; // Default category
+  String selectedCategory = 'Flash Sales'; // Default category
   String selectedType = 'CONCERT'; // Default type (CONCERT or SPORT)
   Map<int, bool> _favorites = {}; // Map to track favorite items
   Map<int, int> _itemCounts = {}; // Map to track item quantities
   int favoriteCount = 0; // ตัวแปรนับจำนวนสินค้าที่กด Favorite
+  List<dynamic> _ProductImages = [];
+  List<dynamic>  _Flashsale = [];
+  bool _isLoading = true;
+
+  
+  
   
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+  fetchProductImages();
+  fetchFlashsale();
+ _scrollController = ScrollController();
+
+  
+
 
     _timer = Timer.periodic(Duration(seconds: 2), (timer) {
       if (_currentIndex < 2) {
@@ -38,12 +51,47 @@ class _ProductState extends State<Product> {
     });
   }
 
+    Future<void> fetchProductImages() async {
+     try {
+      final response = await http.get(Uri.parse('http://192.168.144.137:5000/getAllProduct'));
+      if (response.statusCode == 200) {
+        setState(() {
+          _ProductImages = jsonDecode(response.body);
+          _isLoading = false;
+        });
+
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
+  }
+
+    Future<void> fetchFlashsale() async {
+     try {
+      final response = await http.get(Uri.parse('http://192.168.144.137:5000/getAllflashsale'));
+      if (response.statusCode == 200) {
+        setState(() {
+          _Flashsale = jsonDecode(response.body);
+          _isLoading = false;
+        });
+
+      } else {
+        print('Failed to load concerts: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching concerts: $e');
+    }
+  }
+
   @override
   void dispose() {
     _timer.cancel();
     _scrollController.dispose();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -143,11 +191,13 @@ const SizedBox(height: 10),
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     controller: _scrollController,
-                    children: [
-                      _buildFeaturedProduct('assets/key.jpg'),
-                      _buildFeaturedProduct('assets/bts.jpg'),
-                      _buildFeaturedProduct('assets/order.jpg'),
-                    ],
+
+                    children: _ProductImages.map((ProductImages){
+                        return _buildFeaturedProduct(
+                          ProductImages['image'] ?? 'assets/default.jpg',
+                        );
+
+                    }).toList(),
                   ),
                 ),
                 SizedBox(height: 30),
@@ -180,6 +230,7 @@ const SizedBox(height: 10),
   }
 
     Widget _buildFeaturedProduct(String imagePath) {
+      String imageUrl = "http://192.168.144.137/product/$imagePath";
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Container(
@@ -195,19 +246,20 @@ const SizedBox(height: 10),
             ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                ),
-              ), 
-            ],
-          ),
-        ),
+       child: ClipRRect(
+  borderRadius: BorderRadius.circular(15),
+  child: Container(
+    decoration: BoxDecoration(
+      image: DecorationImage(
+        image: imageUrl.startsWith('http')
+            ? NetworkImage(imageUrl) // โหลดจาก URL
+            : AssetImage(imageUrl) as ImageProvider, // โหลดจาก assets
+        fit: BoxFit.cover,
+      ),
+    ),
+  ),
+),
+
       ),
     );
   }
@@ -218,7 +270,7 @@ const SizedBox(height: 10),
       onTap: () {
         setState(() {
           selectedType = type;
-          selectedCategory = 'ALL';
+          selectedCategory = 'Flash Sales';
         });
       },
       child: Container(
@@ -241,19 +293,19 @@ const SizedBox(height: 10),
 
   List<Widget> _buildConcertCategories() {
     return [
-      _buildCircularImageWithText('assets/shop.png', 'ALL'),
-      _buildCircularImageWithText('assets/key5.jpg', 'KEY'),
-      _buildCircularImageWithText('assets/bts6.jpg', 'SHIRT'),
-      _buildCircularImageWithText('assets/order9.jpg', 'ALBUM'),
+      _buildCircularImageWithText('assets/shop.png', 'Flash Sales'),
+      _buildCircularImageWithText('assets/key5.jpg', 'Shirt'),
+      _buildCircularImageWithText('assets/bts6.jpg', 'Light Stick'),
+      _buildCircularImageWithText('assets/order9.jpg', 'Album'),
     ];
   }
 
   List<Widget> _buildSportCategories() {
     return [
-      _buildCircularImageWithText('assets/sport1.jpg', 'ALL'),
-      _buildCircularImageWithText('assets/sport2.jpg', 'SHOES'),
-      _buildCircularImageWithText('assets/sport3.jpg', 'JERSEY'),
-      _buildCircularImageWithText('assets/sports4.jpg', 'GEAR'),
+      _buildCircularImageWithText('assets/sport1.jpg', 'Flash Sales'),
+      _buildCircularImageWithText('assets/sport2.jpg', 'Shirt'),
+      _buildCircularImageWithText('assets/sport3.jpg', 'Scarf'),
+      _buildCircularImageWithText('assets/sports4.jpg', 'Shoes'),
     ];
   }
 
@@ -285,107 +337,17 @@ const SizedBox(height: 10),
 
   Widget _buildCategoryContent() {
     List<Map<String, String>> items = [];
+    
     if (selectedType == 'CONCERT') {
-       if (selectedCategory == 'ALL') {
-      items = [
-        {
-          'image': 'assets/key2.jpg',
-          'title': 'Key Item 1',
-          'oldPrice': '\$50.00',
-          'newPrice': '\$40.00'
-        },
-        {
-          'image': 'assets/key3.jpg',
-          'title': 'Key Item 2',
-          'oldPrice': '\$45.00',
-          'newPrice': '\$35.00'
-        },
-        {
-          'image': 'assets/key4.jpg',
-          'title': 'Key Item 3',
-          'oldPrice': '\$40.00',
-          'newPrice': '\$30.00'
-        },
-        {
-          'image': 'assets/key5.jpg',
-          'title': 'Key Item 4',
-          'oldPrice': '\$30.00',
-          'newPrice': '\$20.00'
-        },
-        {
-          'image': 'assets/bts3.jpg',
-          'title': 'BTS Item 1',
-          'oldPrice': '\$35.00',
-          'newPrice': '\$25.00'
-        },
-        {
-          'image': 'assets/bts4.jpg',
-          'title': 'BTS Item 2',
-          'oldPrice': '\$45.00',
-          'newPrice': '\$35.00'
-        },
-        {
-          'image': 'assets/bts5.jpg',
-          'title': 'BTS Item 3',
-          'oldPrice': '\$55.00',
-          'newPrice': '\$45.00'
-        },
-        {
-          'image': 'assets/bts6.jpg',
-          'title': 'BTS Item 4',
-          'oldPrice': '\$65.00',
-          'newPrice': '\$55.00'
-        },
-        {
-          'image': 'assets/order1.jpg',
-          'title': 'Order Item 1',
-          'oldPrice': '\$70.00',
-          'newPrice': '\$60.00'
-        },
-        {
-          'image': 'assets/order2.jpg',
-          'title': 'Order Item 2',
-          'oldPrice': '\$80.00',
-          'newPrice': '\$70.00'
-        },
-        {
-          'image': 'assets/order3.jpg',
-          'title': 'Order Item 3',
-          'oldPrice': '\$90.00',
-          'newPrice': '\$80.00'
-        },
-        {
-          'image': 'assets/order5.jpg',
-          'title': 'Order Item 5',
-          'oldPrice': '\$80.00',
-          'newPrice': '\$70.00'
-        },
-        {
-          'image': 'assets/order6.jpg',
-          'title': 'Order Item 6',
-          'oldPrice': '\$70.00',
-          'newPrice': '\$60.00'
-        },
-        {
-          'image': 'assets/order7.jpg',
-          'title': 'Order Item 7',
-          'oldPrice': '\$50.00',
-          'newPrice': '\$40.00'
-        },
-        {
-          'image': 'assets/order8.jpg',
-          'title': 'Order Item 8',
-          'oldPrice': '\$80.00',
-          'newPrice': '\$50.00'
-        },
-        {
-          'image': 'assets/order9.jpg',
-          'title': 'Order Item 9',
-          'oldPrice': '\$80.00',
-          'newPrice': '\$60.00'
-        },
-      ];
-    } else if (selectedCategory == 'KEY') {
+       if (selectedCategory == 'Flash Sales') {
+       items = _Flashsale.map<Map<String, String>>((Flashsale) => {
+       'image': Flashsale['image'] ?? '', // ตรวจสอบว่ามีค่า
+        'title': Flashsale['name'] ?? 'No Title',
+        'oldPrice': Flashsale['oldPrice'] != null ? '\$${Flashsale['oldPrice']}' : '\$0',
+        'newPrice': Flashsale['price'] != null ? '\$${Flashsale['price']}' : '\$0',
+    }).toList();
+
+    } else if (selectedCategory == 'Shirt') {
       items = [
         {
           'image': 'assets/key2.jpg',
@@ -412,7 +374,7 @@ const SizedBox(height: 10),
           'newPrice': '\$20.00'
         },
       ];
-    } else if (selectedCategory == 'SHIRT') {
+    } else if (selectedCategory == 'Light Stick') {
       items = [
         {
           'image': 'assets/bts3.jpg',
@@ -439,7 +401,7 @@ const SizedBox(height: 10),
           'newPrice': '\$55.00'
         },
       ];
-    } else if (selectedCategory == 'ALBUM') {
+    } else if (selectedCategory == 'Album') {
       items = [
         {
           'image': 'assets/order1.jpg',
@@ -493,7 +455,7 @@ const SizedBox(height: 10),
       }
       // Add other categories for CONCERT if needed
     } else if (selectedType == 'SPORT') {
-       if (selectedCategory == 'ALL') {
+       if (selectedCategory == 'Flash Sales') {
       items = [
         {
           'image': 'assets/key2.jpg',
@@ -502,7 +464,7 @@ const SizedBox(height: 10),
           'newPrice': '\$40.00'
         },
       ];
-    } else if (selectedCategory == 'SHOES') {
+    } else if (selectedCategory == 'Shirt') {
       items = [
         {
           'image': 'assets/key2.jpg',
@@ -517,7 +479,7 @@ const SizedBox(height: 10),
           'newPrice': '\$35.00'
         },
       ];
-    } else if (selectedCategory == 'JERSEY') {
+    } else if (selectedCategory == 'Scarf') {
       items = [
         {
           'image': 'assets/bts3.jpg',
@@ -526,7 +488,7 @@ const SizedBox(height: 10),
           'newPrice': '\$25.00'
         },
       ];
-    } else if (selectedCategory == 'GEAR') {
+    } else if (selectedCategory == 'Shoes') {
       items = [
         {
           'image': 'assets/order1.jpg',
@@ -591,73 +553,72 @@ const SizedBox(height: 10),
                 fontSize: 16,
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
+               
               ),
             ),
           ),
 
           // ราคาสินค้า + ปุ่ม Favorite
           
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: .0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text.rich(
-                  TextSpan(
-                    text: items[index]['oldPrice']!,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                      decoration: TextDecoration.lineThrough,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: ' ${items[index]['newPrice']}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                IconButton(
-                  icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.red : Colors.grey,
-                  ),
-                  
-                  onPressed: () {
-                    setState(() {
-                      _favorites[index] = !isFavorite;
-                    
-                      if (_favorites[index] == true) {
-                        favoriteCount++;
-                      } else {
-                        favoriteCount--;
-                      }
-                    });
-                  },
-                ),
-                Flexible(
-                 child:IconButton(
-      icon: Icon(
-        Icons.shopping_cart,
-        color: Colors.blue, // สีของ Shopping Cart
-      ),
-      onPressed: () {
-        // Action สำหรับ Shopping Cart
-      },
-    ),
-                )
-  ],
-)
-              
+   Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Flexible(
+      child: Text.rich(
+        TextSpan(
+          text: items[index]['oldPrice']!,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
+            decoration: TextDecoration.lineThrough,
+          ),
+          children: [
+            TextSpan(
+              text: ' ${items[index]['newPrice']}',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.none,
+              ),
             ),
-          
+          ],
+        ),
+      ),
+    ),
+    Row(
+      children: [
+        IconButton(
+          icon: Icon(
+            isFavorite ? Icons.favorite : Icons.favorite_border,
+            color: isFavorite ? Colors.red : Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              _favorites[index] = !isFavorite;
+              if (_favorites[index] == true) {
+                favoriteCount++;
+              } else {
+                favoriteCount--;
+              }
+            });
+          },
+        ),
+        SizedBox(width: 8), // ระยะห่างระหว่างไอคอน
+        IconButton(
+          icon: Icon(
+            Icons.shopping_cart,
+            color: Colors.blue,
+          ),
+          onPressed: () {
+            // Action สำหรับ Shopping Cart
+          },
+        ),
+      ],
+    ),
+  ],
+),
+
           
 
           // ปุ่มเพิ่ม/ลดจำนวนสินค้า

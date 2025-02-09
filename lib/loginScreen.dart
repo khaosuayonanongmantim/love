@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 // http://127.0.0.1/
 // 172.18.121.190:5000
-   final String apiUrl = "http://172.18.131.47:5000/login";
+   final String apiUrl = "http://192.168.144.137:5000/login";
   try {
     final response = await http.post(
   Uri.parse(apiUrl),

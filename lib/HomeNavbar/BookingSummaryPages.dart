@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
-class BookingSummaryPage extends StatefulWidget {
+import 'package:project_new/Payment/ReceiptConSportPage.dart';
+
+class BookingSummaryPages extends StatefulWidget {
   final String zoneName;
   final List<String> selectedSeats;
   final double totalPrice;
   final double vatAmount;
   final double serviceFee;
 
-  const BookingSummaryPage({
+  const BookingSummaryPages({
     Key? key,
     required this.zoneName,
     required this.selectedSeats,
@@ -17,12 +21,45 @@ class BookingSummaryPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _BookingSummaryPageState createState() => _BookingSummaryPageState();
+  _BookingSummaryPagesState createState() => _BookingSummaryPagesState();
 }
 
-class _BookingSummaryPageState extends State<BookingSummaryPage> {
+class _BookingSummaryPagesState extends State<BookingSummaryPages> {
   bool isChecked = false; // จัดการสถานะของ Checkbox
+   File? selectedImage; 
 
+
+  // ตัวแปรสำหรับเก็บค่าฟอร์มของบัตรเครดิต
+  final TextEditingController cardNumberController = TextEditingController();
+  final TextEditingController cardHolderController = TextEditingController();
+  final TextEditingController cvvController = TextEditingController();
+  String? selectedMonth;
+  String? selectedYear;
+
+
+
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+
+
+ // ฟังก์ชันตรวจสอบฟอร์มบัตรเครดิต
+  bool _validateCardForm() {
+    return cardNumberController.text.isNotEmpty &&
+        cardHolderController.text.isNotEmpty &&
+        cvvController.text.isNotEmpty &&
+        selectedMonth != null &&
+        selectedYear != null;
+  }
+
+
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -194,103 +231,146 @@ class _BookingSummaryPageState extends State<BookingSummaryPage> {
             ),
             const SizedBox(height: 20),
             
-            ExpansionTile(
-  title: const Text('เดบิต/เครดิตการ์ด', style: TextStyle(color: Colors.red)),
-  children: [
-    Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const TextField(
-            decoration: InputDecoration(
-              labelText: 'หมายเลขบัตรเครดิต',
-              border: OutlineInputBorder(),
+             ExpansionTile(
+              title: const Text('เดบิต/เครดิตการ์ด', style: TextStyle(color: Colors.red)),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: cardNumberController,
+                        decoration: const InputDecoration(
+                          labelText: 'หมายเลขบัตรเครดิต',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: cardHolderController,
+                        decoration: const InputDecoration(
+                          labelText: 'ชื่อผู้ถือบัตร',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                labelText: 'เดือน',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: List.generate(
+                                12,
+                                (index) => DropdownMenuItem(
+                                  value: '${index + 1}'.padLeft(2, '0'),
+                                  child: Text('${index + 1}'.padLeft(2, '0')),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedMonth = value;
+                                });
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                labelText: 'ปี',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: List.generate(
+                                10,
+                                (index) => DropdownMenuItem(
+                                  value: '${DateTime.now().year + index}',
+                                  child: Text('${DateTime.now().year + index}'),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedYear = value;
+                                });
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              controller: cvvController,
+                              decoration: const InputDecoration(
+                                labelText: 'CVV',
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: _validateCardForm()
+                              ? () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('ยืนยันการสั่งซื้อ'),
+                                        content: const Text(
+                                            'คุณแน่ใจหรือไม่ว่าต้องการยืนยันการสั่งซื้อ?'),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('ยกเลิก'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => ReceiptConSportPage(),
+                                                ),
+                                              );
+                                            },
+                                            style: ElevatedButton.styleFrom(primary: Colors.redAccent),
+                                            child: const Text('ยืนยัน'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.redAccent,
+                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: const Text(
+                            'ยืนยันการสั่งซื้อ',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: 10),
-          const TextField(
-            decoration: InputDecoration(
-              labelText: 'ชื่อผู้ถือบัตร',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'เดือน',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: List.generate(
-                    12,
-                    (index) => DropdownMenuItem(
-                      value: '${index + 1}'.padLeft(2, '0'),
-                      child: Text('${index + 1}'.padLeft(2, '0')),
-                    ),
-                  ),
-                  onChanged: (value) {},
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'ปี',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: List.generate(
-                    10,
-                    (index) => DropdownMenuItem(
-                      value: '${DateTime.now().year + index}',
-                      child: Text('${DateTime.now().year + index}'),
-                    ),
-                  ),
-                  onChanged: (value) {},
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'CVV',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('ข้อมูลบัตรถูกบันทึก')),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.redAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: const Text(
-                'ยืนยันการสั่งซื้อ',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  ],
-),
-
     ExpansionTile(
   title: const Text('พร้อมเพย์', style: TextStyle(color: Colors.red)),
   children: [
@@ -354,15 +434,38 @@ class _BookingSummaryPageState extends State<BookingSummaryPage> {
                             color: Colors.green,
                           ),
                         ),
-                      ],
-                    ),
+                             const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _pickImage,
+                style: ElevatedButton.styleFrom(primary: Colors.blueAccent),
+                child: const Text('แนบไฟล์รูป'),
+              ),
+              selectedImage != null 
+                ? Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      Image.file(
+                        selectedImage!,
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
+                    ],
+                  )
+                : Container(),
+            ],
+          ),
+                  
                     actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context); // ปิด Pop-up
-                        },
+                      ElevatedButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ReceiptConSportPage()),
+      );
+    },
                         child: const Text(
-                          'ปิด',
+                          'แสดงใบเสร็จ',
                           style: TextStyle(color: Colors.red),
                         ),
                       ),
@@ -389,10 +492,10 @@ class _BookingSummaryPageState extends State<BookingSummaryPage> {
     ),
   ],
 )
-
           ],
         ),
-      ),
-    );
+        
+        ),
+      );
   }
 }

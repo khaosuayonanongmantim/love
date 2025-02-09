@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:project_new/NextPage.dart';
 
 class Message extends StatefulWidget {
   const Message({super.key});
@@ -11,6 +10,30 @@ class Message extends StatefulWidget {
 class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _animation;
+
+  // Add the missing additionalInformation list
+  final List<Map<String, String>> additionalInformation = [
+    {
+      'title': 'เชลซี" คืนฟอร์ม เปิดบ้านกำราบ "วูล์ฟแฮมป์ตัน',
+      'description': '3-1 ขึ้นที่ 4 ตาม "ลิเวอร์พูล" 10 แต้ม พรีเมียร์ลีก',
+      'image': 'assets/news1.jpg',
+    },
+    {
+      'title': 'เฮดโค้ชลิเวอร์พูล” คอนเฟิร์มข่าวร้าย! “โชตา-โจ โกเมซ” ',
+      'description': 'ต้องพักอีกหลายสัปดาห์  อดบู๊ “ลีลล์” ในศึก ยูฟ่า แชมเปียนส์ลีก',
+      'image': 'assets/news2.jpg',
+    },
+    {
+      'title': 'เด็กข้างบ้านทักทายครับ! BOYNEXTDOOR ',
+      'description': 'เจอแฟนไทย 29 มี.ค.นี้ ณ ธันเดอร์โดม เมืองทองธานี',
+      'image': 'assets/news3.png',
+    },
+    {
+      'title': 'สัมภาษณ์เอ็กซ์คลูซีฟ wave to earth ',
+      'description': 'จัดคอนเสิร์ตที่ไทยครั้งที่ 4 กับคอนเสิร์ตรับอัลบั้มใหม่ ',
+      'image': 'assets/news4.png',
+    },
+  ];
 
   @override
   void initState() {
@@ -30,6 +53,8 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
       curve: Curves.linear, // Smooth constant scrolling
     ));
   }
+
+  
 
   @override
   void dispose() {
@@ -76,16 +101,28 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
                 child: PageView(
                   children: [
                     _buildPage(
-                      title: 'World Trends 2024',
-                      content: 'Catch up on the latest global trends for 2024, from economic shifts to social movements. This section highlights key areas to watch and offers insights into how these trends could affect individuals and businesses worldwide.',
+                      imagePath: 'assets/in1.jpg',
+                      title: 'GMM MUSIC เปิดตัวค่าย 19 และศิลปินเลือดใหม่มากความสามารถทั้ง 5 คน มาพร้อมอัลบั้มแรก!',
+                      content: 'นับเป็นหนึ่งความน่าสนใจในปีนี้กับการเปิดค่าย 19 (ไนน์-ทีน) ค่ายน้องใหม่ล่าสุดในเครือ GMM Music ซึ่งหลังจากเฟ้นหาศิลปินในสังกัดกันอย่างเข้มข้นในรายการ 19Lab จากผู้สมัครทั่วประเทศคัดจนเหลือเพียง 91 คน ', 
+                      onReadMore: () {  },
                     ),
                     _buildPage(
-                      title: 'Insights and Analysis',
-                      content: 'Dive deeper into the details behind these trends and understand how they may impact various industries. Gain insights that can help shape your perspective and decisions for the coming year.',
+                      imagePath: 'assets/in2.jpg',
+                      title: '“j.rabbit” ชวนมาเก็บโมเมนต์ความสุขไปกับซิงเกิลใหม่ “Capture” เพลงป๊อบฟังสบายติดหู!',
+                      content: '“j.rabbit” หรือ “เจสัน โสตางกูร” ศิลปินมากฝีมือจากค่ายเพลง MILK! BKK หลังจากเดบิวต์เป็นศิลปินเดี่ยวพร้อมเพลงจังหวะสนุกอย่าง “Loop” และตามด้วยเพลงเอาใจคนดีที่เธอไม่รัก “แค่ดี (it’s not me)” ',
+                      onReadMore: () {  },
                     ),
                     _buildPage(
-                      title: 'Future Predictions',
-                      content: 'Explore predictions for the future and understand potential changes in technology, economy, and society. These insights will help you stay prepared and informed about what lies ahead.',
+                      imagePath: 'assets/in3.jpg',
+                      title: 'GET TO KNOW LITTLE JOHN วงร็อกฟอร์มดีผู้สร้างปรากฏการณ์เพลงเปิดตัวสุดฮิต “ฉันไม่ต้องการตัวเธอในตอนนี้”',
+                      content: '“LITTLE JOHN” น้องใหม่ไฟแรงที่พร้อมปลุกเนื้อแท้ของความร็อกให้กลับมาอีกครั้ง ย้อนไปเมื่อปี 2020 มีวัยรุ่นกลุ่มหนึ่งที่อยากถ่ายทอดมุมมองที่มีต่อความรักและสังคมรอบข้าง ',
+                      onReadMore: () {  },
+                    ),
+                     _buildPage(
+                      imagePath: 'assets/in4.jpg',
+                      title: 'รวมไอดอลไทป์ลูกแมวน้อย   น่ารักกระปุ๊กกระปิ๊กที่สุดเลยเหมี๊ยววว ~',
+                      content: 'ในเมื่อมีไอดอลไทป์ลูกหมาบ๊อกแบ๊กไปแล้ว.. เพื่อฉลอง “วันแมวสากล (International Cat Day)” ก็ต้องมีเหล่าไอดอลไทป์แมวน้อยน่ารักกระปุ๊กกระปิ๊ก ',
+                      onReadMore: () {  },
                     ),
                   ],
                 ),
@@ -117,34 +154,21 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     SizedBox(height: 16),
-                    GridView.count(
+                    GridView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(), // Disable scrolling for GridView inside Column
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      children: [
-                        _buildInfoCard(
-                          icon: Icons.campaign,
-                          title: 'EXCITING NEWS',
-                          content: 'Stay tuned for the latest updates and exciting news!',
-                        ),
-                        _buildInfoCard(
-                          icon: Icons.rocket_launch,
-                          title: 'NEW LAUNCHES',
-                          content: 'We’re launching new products! Don’t miss out on the latest releases.',
-                        ),
-                        _buildInfoCard(
-                          icon: Icons.public,
-                          title: 'NEW LAUNCHES',
-                          content: 'Stay tuned for the latest updates and exciting news!',
-                        ),
-                        _buildInfoCard(
-                          icon: Icons.lightbulb,
-                          title: 'EXCITING NEWS',
-                          content: 'We’re launching new products! Don’t miss out on the latest releases.',
-                        ),
-                      ],
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.85, // ปรับอัตราส่วนให้พอดีกับภาพ
+                        
+                      ),
+                      itemCount: additionalInformation.length,
+                      itemBuilder: (context, index) {
+                        final info = additionalInformation[index];
+                        return _buildInfoCard(info);
+                      },
                     ),
                   ],
                 ),
@@ -227,9 +251,9 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
               // Event Announcement Section
               _buildEventAnnouncement(
                 title: 'Event Announcement',
-                imagePath: 'assets/pop3.jpg',
-                description: 'Join us for an unforgettable event filled with amazing experiences, new opportunities, and thrilling moments. Save the date!',
-                buttonText: 'Learn More',
+                imagePath: 'assets/pos1.jpg',
+                description: 'สิ้นสุดการรอคอย BODYSLAM!! การรวมตัวของชาวร็อคที่ยิ่งใหญ่ The wait is over. The Great Rock Fan assembly is coming',
+
                 onPressed: () {
                   // Add your navigation or functionality here
                 },
@@ -239,39 +263,37 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
 
               // Special Event Announcement Section
               _buildEventAnnouncement(
-                title: 'Special Event Announcement',
-                imagePath: 'assets/pop3.jpg',
-                description: 'Don\'t miss our special event featuring exclusive content and unique experiences. Mark your calendar!',
-                buttonText: 'Find Out More',
+                title: 'Event Announcement',
+                imagePath: 'assets/pos2.jpg',
+                description: 'บีอัสเตรียมกรี๊ดดด!!!! BUS BECAUSE OF YOU I SHINE ประกาศคอนเสิร์ตใหญ่ 15 มี.ค. 68',
+                
                 onPressed: () {
                   // Add your navigation or functionality here
                 },
               ),
-                      SizedBox(height: 20),
 
-          Center(
-  child: ElevatedButton(
-    onPressed: () {
-      // Navigate to the Next Page when button is pressed
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => NextPage()), // NextPage is the new page we created
-      );
-    },
-    style: ElevatedButton.styleFrom(
-      primary: const Color.fromARGB(255, 38, 44, 48), // Customize button color
-      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-    ),
-    child: Text(
-      'Next Page',
-      style: TextStyle(
-        color: Colors.white, // เปลี่ยนสีข้อความที่นี่
-        fontSize: 18,         // ปรับขนาดข้อความถ้าต้องการ
-        fontWeight: FontWeight.bold, // ปรับน้ำหนักของฟอนต์
-      ),
-    ),
-  ),
-)
+               _buildEventAnnouncement(
+                title: 'Important Announcement',
+                imagePath: 'assets/pos3.jpg',
+                description: 'ประกาศ!!! คอนเสิร์ตใหญ่ครั้งสำคัญเต็มรูปเเบบครั้งเเรก วง Bamm ห้ามพลาด เเล้วมาพบกับความสนุกสนานได้ในวันที่ 22 กุมภาพันธ์ 2568',
+                
+                onPressed: () {
+                  // Add your navigation or functionality here
+                },
+              ),
+
+               _buildEventAnnouncement(
+                title: 'Important Announcement',
+                imagePath: 'assets/pos4.jpg',
+                description: 'เตรียมตัวให้พร้อม "COCKTAIL" ประกาศคอนเสิร์ตครั้งยิ่งใหญ่เต็มรูปเเบบครั้งสุดท้าย',
+                
+                onPressed: () {
+                  // Add your navigation or functionality here
+                },
+              ),
+                    
+
+       
               
             ],
           ),
@@ -285,7 +307,6 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
     required String title,
     required String imagePath,
     required String description,
-    required String buttonText,
     required VoidCallback onPressed,
   }) {
     return Container(
@@ -331,18 +352,7 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
             style: TextStyle(fontSize: 16, color: Colors.black),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(
-              primary: Color.fromARGB(255, 214, 217, 221),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-            ),
-            child: Text(buttonText),
-          ),
+        
         ],
       ),
     );
@@ -350,7 +360,7 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
   
   
 
-  Widget _buildPage({required String title, required String content}) {
+  Widget _buildPage({required String imagePath, required String title, required String content,  required VoidCallback onReadMore,}) {
     return Container(
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 200, 189, 189),
@@ -377,8 +387,8 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: 
-              Image.network(
-                'https://via.placeholder.com/400x400',
+              Image.asset(
+               imagePath,
                 fit: BoxFit.cover,
               ),
             ),
@@ -387,7 +397,7 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
           Text(
             title,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: Colors.deepPurple[800],
             ),
@@ -396,20 +406,37 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
           Text(
             content,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 12,
               color: Colors.grey[800],
               height: 1.5,
+              ),
+        ),
+        SizedBox(height: 5),
+        Align(
+          alignment: Alignment.center,
+          child: ElevatedButton(
+            onPressed: onReadMore,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple[700],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              "ดูเพิ่มเติม",
+              style: TextStyle(color: Colors.white),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
-  Widget _buildInfoCard({required IconData icon, required String title, required String content}) {
+  Widget _buildInfoCard(Map<String, String> info) {
     return Container(
       width: double.infinity, // ตั้งให้เต็มความกว้างของช่องใน GridView
-      height: 150, // ตั้งค่าความสูงตามที่ต้องการ
+      height: 200, // ตั้งค่าความสูงตามที่ต้องการ
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -425,22 +452,37 @@ class _MessageState extends State<Message> with SingleTickerProviderStateMixin {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 25, color: Colors.blueGrey[700]),
-          SizedBox(height: 25),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: info['image']!.startsWith('http')
+              ? Image.network(
+                  info['image']!,
+                  height: 100,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                )
+              : Image.asset(
+                  info['image']!,
+                  height: 100,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+        ),
+          SizedBox(height: 8),
           Text(
-            title,
+            info['title']!,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 10,
               fontWeight: FontWeight.bold,
               color: Colors.blueGrey[800],
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 5),
           Text(
-            content,
+            info['description']!,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 8,
               color: Colors.grey[600],
               height: 1.4,
             ),
