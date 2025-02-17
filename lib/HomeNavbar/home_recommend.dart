@@ -39,7 +39,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
   Future<void> fetchConcerts() async {
     try {
       final response = await http
-          .get(Uri.parse('http://192.168.55.228:5000/getAllConcertsthaiMass'));
+          .get(Uri.parse('http://192.168.55.228:5000/getAllConcertskpop'));
       if (response.statusCode == 200) {
         setState(() {
           _concerts = jsonDecode(response.body);
@@ -56,7 +56,7 @@ class _RecommendedHomeState extends State<RecommendedHome> {
   Future<void> fetchSports() async {
     try {
       final response = await http
-          .get(Uri.parse('http://192.168.55.228:5000/getAllSportsFootball'));
+          .get(Uri.parse('http://192.168.55.228:5000/getAllSports'));
       if (response.statusCode == 200) {
         setState(() {
           _sports = jsonDecode(response.body);
@@ -280,20 +280,24 @@ Widget buildVerticalImageWithText(
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Icon(Icons.location_on_sharp,
-                        color: Colors.red),
-                    Text(
-                      location,
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+               Row(
+  children: [
+    const Icon(Icons.location_on_sharp, color: Colors.red),
+    Expanded(
+      child: Text(
+        location ?? '',
+        style: const TextStyle(
+          color: Colors.red,
+          fontSize: 17,
+          fontWeight: FontWeight.bold,
+        ),
+        overflow: TextOverflow.visible, // ให้ข้อความขึ้นบรรทัดใหม่
+        softWrap: true, // เปิดให้สามารถขึ้นบรรทัดใหม่ได้
+      ),
+    ),
+  ],
+),
+
               ],
             ),
           ),

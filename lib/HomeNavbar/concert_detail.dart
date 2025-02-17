@@ -88,6 +88,7 @@ class ConcertDetail extends StatelessWidget {
                           },
                         ),
                       ),
+                   
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -228,12 +229,18 @@ class ConcertDetail extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    ConcertPlan(), // ไปที่หน้าของคุณ
+                                builder: (context) => ConcertPlan(
+                                  imagePath: imagePath,
+                                  concertName: text1,
+                                  date: formattedDate,
+                                  time: text3,
+                                  location: text4,
+                                ),
                               ),
+                              
                             );
                           },
-                          style: ElevatedButton.styleFrom(
+                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 const Color.fromARGB(255, 255, 41, 26),
                             shape: RoundedRectangleBorder(
@@ -249,7 +256,8 @@ class ConcertDetail extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
+                        )
+                     
                       ],
                     ),
                   ),

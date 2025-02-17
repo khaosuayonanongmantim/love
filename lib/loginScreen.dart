@@ -53,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
    if (response.statusCode == 200) {
   final data = json.decode(response.body);
   print("Parsed Data: $data");
+  // print("Parsed User: ${data['user']}");
 
   if (data['role'] == "user") {
     String firstName = data['first_name'] ?? "User"; // Handle null values

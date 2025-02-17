@@ -3,11 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:project_new/HomeNavbar/ZoneDetailPage.dart';
 
 class ConcertPlan extends StatefulWidget {
-  const ConcertPlan({super.key});
+  final String imagePath;
+  final String concertName;
+  final String date;
+  final String time;
+  final String location;
+
+  const ConcertPlan({
+    Key? key,
+    required this.imagePath,
+    required this.concertName,
+    required this.date,
+    required this.time,
+    required this.location,
+  }) : super(key: key);
 
   @override
   State<ConcertPlan> createState() => _ConcertPlanState();
 }
+
 
 class _ConcertPlanState extends State<ConcertPlan> {
   late Timer _timer;
@@ -99,33 +113,43 @@ void initState() {
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
-  void updatePrice(String price) {
-    setState(() {
-      selectedPrice = price;
+ void updatePrice(String price) {
+  setState(() {
+    selectedPrice = price;
 
-      // อัปเดตรายการโซนตามราคา
-      if (price == "฿3,500") {
-        seatZones = ['BB1', 'BB2', 'BB3', 'BB4', 'BB5', 'BB6'];
-      } else if (price == "฿5,500") {
-        seatZones = ['AA1', 'AA2', 'AA3'];
-      } else if (price == "฿4,500") {
-        seatZones = ['AA4', 'AA5', 'AA6'];
-      } else if (price == "฿2,500") {
-        seatZones = ['STD'];
-      }
-    });
-  }
+    // อัปเดตรายการโซนตามราคา
+    if (price == "฿3,500") {
+      seatZones = ['BB1', 'BB2', 'BB3', 'BB4', 'BB5', 'BB6'];
+    } else if (price == "฿5,500") {
+      seatZones = ['AA1', 'AA2', 'AA3'];
+    } else if (price == "฿4,500") {
+      seatZones = ['AA4', 'AA5', 'AA6'];
+    } else if (price == "฿2,500") {
+      seatZones = ['STD'];
+    }
 
-  void _bookSeat(String zone) {
-  debugPrint("เลือกโซน: $zone ราคา: $selectedPrice");
+    // ตรวจสอบให้ seatPrices มีจำนวนรายการเท่ากับ seatZones
+    seatPrices = List.generate(seatZones.length, (index) => price);
+  });
+}
+
+void _bookSeat(String zone) {
+  setState(() {
+    selectedZone = zone;
+  });
 
   // เมื่อเลือกโซน จะนำทางไปยังหน้ารายละเอียดของโซนที่เลือก
-  Navigator.push(
+    Navigator.push(
     context,
     MaterialPageRoute(
       builder: (context) => ZoneDetailPage(
         zoneName: zone,
         selectedPrice: selectedPrice,
+        imagePath: widget.imagePath,
+        concertName: widget.concertName,
+        date: widget.date,
+        time: widget.time,
+        location: widget.location,
       ),
     ),
   );
@@ -366,9 +390,3 @@ Widget build(BuildContext context) {
 
 
 
-void main() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: ConcertPlan(),
-  ));
-}

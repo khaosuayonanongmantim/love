@@ -301,14 +301,14 @@ class _RecommantpromotionState extends State<Recommantpromotion> {
                             children: [
                               
                               // ข้อความ Title
-                              Text(
-                                promotion[
-                                    'name'], // ใช้ข้อมูลจาก API (เปลี่ยนให้ตรงกับโครงสร้าง API)
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              // Text(
+                              //   promotion[
+                              //       'name'], // ใช้ข้อมูลจาก API (เปลี่ยนให้ตรงกับโครงสร้าง API)
+                              //   style: TextStyle(
+                              //     fontSize: 14,
+                              //     fontWeight: FontWeight.bold,
+                              //   ),
+                              // ),
                               // แสดงรูปภาพจาก URL
                               SizedBox(height: 10),
                               Image.network(

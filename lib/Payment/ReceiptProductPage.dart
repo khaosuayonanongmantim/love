@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import 'package:project_new/Payment/PaymentproSuccess.dart';
 
 class ReceiptProductPage extends StatefulWidget {
   final Map<int, int> itemCounts;
@@ -22,6 +22,7 @@ class _ReceiptProductPageState extends State<ReceiptProductPage> {
   String? selectedPaymentMethod;
   bool isCreditCardSelected = false;
   File? slip;
+  
 
   // Function to pick an image for the slip
   Future<void> _pickSlipImage() async {
@@ -41,6 +42,7 @@ class _ReceiptProductPageState extends State<ReceiptProductPage> {
       appBar: AppBar(
         title: Text('Payment'),
         centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 255, 135, 175),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -56,19 +58,30 @@ class _ReceiptProductPageState extends State<ReceiptProductPage> {
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Row(
                     children: [
-                      SizedBox(
-                        height: 50,
-                        width: 50,
-                        child: Image.asset(entry.value['image']!),
-                      ),
-                      SizedBox(width: 16),
+                      // SizedBox(
+                      //   height: 50,
+                      //   width: 50,
+                      //   child: Image.asset(entry.value['image']!),
+                      // ),
+
                       Expanded(
                         child: Text(
                           '${entry.value['title']}',
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      Text('จำนวน: $itemCount ราคา: ${entry.value['newPrice']}'),
+                      Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // จัดให้อยู่ทางซ้าย
+                        children: [
+                          Text('จำนวน: $itemCount'),
+                          Text('ราคา: ${entry.value['newPrice']}',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold)),
+                        ],
+                      ),
                     ],
                   ),
                 );
@@ -76,7 +89,7 @@ class _ReceiptProductPageState extends State<ReceiptProductPage> {
                 return SizedBox.shrink();
               }
             }).toList(),
-            Divider(height: 32, thickness: 1),
+            Divider(height: 32, thickness: 1, color: Colors.black),
             // Total Price Section
             Text(
               'ราคารวมทั้งหมด: ${widget.totalPrice.toStringAsFixed(2)} บาท',
@@ -87,13 +100,14 @@ class _ReceiptProductPageState extends State<ReceiptProductPage> {
               ),
               textAlign: TextAlign.center,
             ),
-            Divider(height: 35, thickness: 1),
+            Divider(height: 35, thickness: 1, color: Colors.black),
             // User Information Form
             _buildTextField(label: 'ชื่อ *'),
             _buildTextField(label: 'นามสกุล *'),
             _buildTextField(label: 'ที่อยู่ *', maxLines: 3),
-            _buildTextField(label: 'เบอร์โทรศัพท์ *', keyboardType: TextInputType.phone),
-            SizedBox(height: 16), 
+            _buildTextField(
+                label: 'เบอร์โทรศัพท์ *', keyboardType: TextInputType.phone),
+            SizedBox(height: 16),
             DropdownButtonFormField<String>(
               decoration: InputDecoration(
                 labelText: 'วิธีชำระเงิน *',
@@ -131,7 +145,7 @@ class _ReceiptProductPageState extends State<ReceiptProductPage> {
             // Display QR Code when QR code payment is selected
             if (selectedPaymentMethod == 'cash') ...[
               Center(
-                child: Image.asset('assets/qr.jpg', height: 350),
+                child: Image.asset('assets/qr1.jpg', height: 350),
               ),
             ],
             SizedBox(height: 16),
@@ -168,11 +182,31 @@ class _ReceiptProductPageState extends State<ReceiptProductPage> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
+                  // แสดง Snackbar ก่อนเปลี่ยนหน้า
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('การชำระเงินสำเร็จ!')),
                   );
+
+                  // นำทางไปยังหน้า PaymentSuccessPage
+                  Future.delayed(Duration(seconds: 1), () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => PaymentSuccess()),
+                    );
+                  });
                 },
-                child: Text('ยืนยันการชำระเงิน'),
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xFFFF1A79), // Pink color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  elevation: 5,
+                ),
+                child: Text(
+                  'ยืนยันการชำระเงิน',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ),
             ),
           ],

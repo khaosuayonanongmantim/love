@@ -4,7 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:project_new/HomeNavbar/ZoneDetailSportPage.dart';
 
 class SportPlan extends StatefulWidget {
-  const SportPlan({super.key});
+  final String imagePath;
+  final String concertName;
+  final String date;
+  final String time;
+  final String location;
+
+  const SportPlan({
+    Key? key,
+    required this.imagePath,
+    required this.concertName,
+    required this.date,
+    required this.time,
+    required this.location,
+  }) : super(key: key);
 
   @override
   State<SportPlan> createState() => _SportPlanState();
@@ -62,7 +75,16 @@ class _SportPlanState extends State<SportPlan> {
   Widget buildSeatLayout() {
     final double radius = 120; // Radius of the circular layout
     final List<String> zones = [
-      'AA1', 'AA2', 'AA3', 'AA4', 'AA5', 'AA6', 'AA7', 'AA8', 'AA9', 'AA10'
+      'AA1',
+      'AA2',
+      'AA3',
+      'AA4',
+      'AA5',
+      'AA6',
+      'AA7',
+      'AA8',
+      'AA9',
+      'AA10'
     ];
 
     return SizedBox(
@@ -155,7 +177,7 @@ class _SportPlanState extends State<SportPlan> {
             elevation: 4,
             child: ListTile(
               leading: CircleAvatar(
-                radius: 25, 
+                radius: 25,
                 backgroundColor: Colors.blueAccent,
                 child: Text(
                   seat['seat']!,
@@ -169,12 +191,19 @@ class _SportPlanState extends State<SportPlan> {
               title: Text(seat['name']!),
               subtitle: Text(seat['price']!),
               trailing: ElevatedButton(
-               onPressed: () {
+                onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          ZoneDetailSportPage(zoneName: seat['seat']!, selectedPrice: seat['price']!,),
+                      builder: (context) => ZoneDetailSportPage(
+                        zoneName: seat['seat']!,
+                        selectedPrice: seat['price']!,
+                        imagePath: widget.imagePath,
+                        concertName: widget.concertName,
+                        date: widget.date,
+                        time: widget.time,
+                        location: widget.location,
+                      ),
                     ),
                   );
                 },
@@ -234,11 +263,4 @@ class _SportPlanState extends State<SportPlan> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: SportPlan(),
-  ));
 }
