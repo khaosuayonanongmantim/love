@@ -1,450 +1,190 @@
 import 'dart:convert';
-import 'dart:async'; // Import dart:async for Timer
-import 'package:flutter/material.dart';
-import 'package:project_new/HomeNavbar/concert_detail.dart';
-import 'package:project_new/HomeNavbar/concert_enjoy.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-// import 'concert_detail.dart'; // Import the ConcertDetail widget
+import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
+import 'package:project_new/HomeNavbar/ZoneDetailPage.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+class ConcertPlan extends StatefulWidget {
+  final String imagePath;
+  final String concertName;
+  final String date;
+  final String time;
+  final String location;
+  final String price;
+
+  const ConcertPlan({
+    Key? key,
+    required this.imagePath,
+    required this.concertName,
+    required this.date,
+    required this.time,
+    required this.location,
+    required this.price,
+  }) : super(key: key);
 
   @override
-  State<Profile> createState() => _ProfileState();
+  State<ConcertPlan> createState() => _ConcertPlanState();
 }
 
-class _ProfileState extends State<Profile> {
-  final PageController _controller = PageController();
-  Timer? _timer;
-  String selectedType = 'CONCERT';
-  int favoriteCount = 0;
-  int selectedIndex = 0; // Store the selected index
-  String selectedCategory = 'ทั้งหมด'; // Track the selected category
-  List<dynamic> _ProductImages = [];
-  List<dynamic> _concerts = [];
-  List<dynamic> _concertsThaimass = [];
+class _ConcertPlanState extends State<ConcertPlan> {
+  late Timer _timer;
+  int _remainingTime = 300; // ตั้งค่าเวลานับถอยหลัง (300 วินาที = 5 นาที)
+  String selectedPrice = "฿2,500"; // ราคาเริ่มต้นที่เลือก
+  String selectedZone = "STD"; // โซนที่เลือก
+  List<String> seatZones = ['STD']; // รายการโซนที่แสดงผล
+  List<String> seatPrices = [];
+  List<dynamic> _zones = [];
   bool _isLoading = true;
 
-  // Define the items for each category
+@override
+void initState() {
+  super.initState();
+  fetchZones("6"); // แก้ให้เป็น concert_id ที่ถูกต้อง
+  startTimer();
+}
 
-  @override
-  void initState() {
-    super.initState();
-    _startAutoScroll();
-    fetchProductImages();
-    fetchConcerts();
-    fetchConcertsThaimass();
-    _controller.addListener(_onPageChanged);
-  }
- List<Widget> _buildConcertCategories() {
-    return [
-      _buildCircularImageWithText('assets/shop.png', 'Flash Sales'),
-      _buildCircularImageWithText('assets/key5.jpg', 'Shirt'),
-      _buildCircularImageWithText('assets/bts6.jpg', 'Light Stick'),
-      _buildCircularImageWithText('assets/order9.jpg', 'Album'),
-    ];
-  }
 
-  List<Widget> _buildSportCategories() {
-    return [
-      _buildCircularImageWithText('assets/sport1.jpg', 'FlashSp'),
-      _buildCircularImageWithText('assets/sport2.jpg', 'ShirtSp'),
-      _buildCircularImageWithText('assets/sport3.jpg', 'Scarf'),
-      _buildCircularImageWithText('assets/sports4.jpg', 'Shoes'),
-    ];
-  }
+Future<void> fetchZones(String concertID) async {
+  try {
+    final response = await http.get(Uri.parse(
+        'http://192.168.55.228:5000/getZones?concert_id=$concertID'));
 
-  Future<void> fetchProductImages() async {
-    try {
-      final response =
-          await http.get(Uri.parse('http://192.168.55.228:5000/getAllProduct'));
-      if (response.statusCode == 200) {
-        setState(() {
-          _ProductImages = jsonDecode(response.body);
-          _isLoading = false;
-        });
-      } else {
-        print('Failed to load concerts: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching concerts: $e');
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      print("🎯 ข้อมูลที่ได้จาก API: $data"); // ✅ เช็คว่าข้อมูลมาไหม
+
+      setState(() {
+        _zones = data;
+        _isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load zones');
     }
+  } catch (e) {
+    print('❌ Error fetching zones: $e');
   }
+}
 
-  var categoryItems = {
-    'ทั้งหมด': [],
-    'THAI MASS': [],
-    'T-POP': [],
-    'K-POP': [],
-    'INTERNATIONAL': [],
-  };
 
-  Future<void> fetchConcerts() async {
-    try {
-      final response = await http
-          .get(Uri.parse('http://192.168.55.228:5000/getAllConcerts'));
-      if (response.statusCode == 200) {
-        List<dynamic> concerts = jsonDecode(response.body);
-
-        // แปลงข้อมูลจาก API ให้อยู่ในรูปแบบ categoryItems
-        Map<String, List<Map<String, String>>> updatedCategories = {
-          'ทั้งหมด': [],
-          'THAI MASS': [],
-          'T-POP': [],
-          'K-POP': [],
-          'INTERNATIONAL': [],
-        };
-
-        for (var concert in concerts) {
-          String category = concert['category'] ?? 'ทั้งหมด';
-          if (!updatedCategories.containsKey(category)) {
-            updatedCategories[category] = [];
-          }
-
-          updatedCategories[category]!.add({
-            'imagePath': concert['image'] ?? 'assets/default.jpg',
-            'text1': concert['name'] ?? 'Unknown Concert',
-            'text2': concert['date'] ?? 'Unknown Date',
-            'text3': concert['time'] ?? 'Unknown Time',
-            'text4': concert['location'] ?? 'Unknown Location',
-            'text5': concert['price'] ?? 'N/A', // เพิ่มราคาที่รับจาก API
-            'boxColor': '0xFFFFFFFF',
-            'textColor': '0xFF000000',
-          });
-        }
-
-        setState(() {
-          // รวมข้อมูลของ API นี้เข้ากับ categoryItems เดิม
-          categoryItems.forEach((key, value) {
-            if (updatedCategories.containsKey(key)) {
-              categoryItems[key]!.addAll(updatedCategories[key]!);
-            }
-          });
-          _concerts = concerts;
-          _isLoading = false;
-        });
-      } else {
-        print('Failed to load concerts: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching concerts: $e');
-    }
-  }
-
-  Future<void> fetchConcertsThaimass() async {
-    try {
-      final response = await http
-          .get(Uri.parse('http://192.168.55.228:5000/getAllConcertsthaiMass'));
-      if (response.statusCode == 200) {
-        List<dynamic> concerts = jsonDecode(response.body);
-
-        // แปลงข้อมูลจาก API ให้อยู่ในรูปแบบ categoryItems
-        Map<String, List<Map<String, String>>> updatedCategories = {
-          'ทั้งหมด': [],
-          'THAI MASS': [],
-          'T-POP': [],
-          'K-POP': [],
-          'INTERNATIONAL': [],
-        };
-
-        for (var concert in concerts) {
-          String category = concert['category'] ?? 'THAI MASS';
-          if (!updatedCategories.containsKey(category)) {
-            updatedCategories[category] = [];
-          }
-
-          updatedCategories[category]!.add({
-            'imagePath': concert['image'] ?? 'assets/default.jpg',
-            'text1': concert['name'] ?? 'Unknown Concert',
-            'text2': concert['date'] ?? 'Unknown Date',
-            'text3': concert['time'] ?? 'Unknown Time',
-            'text4': concert['location'] ?? 'Unknown Location',
-            'text5': concert['price'] ?? 'N/A',
-            'boxColor': '0xFFFFFFFF',
-            'textColor': '0xFF000000',
-          });
-        }
-
-        setState(() {
-          // รวมข้อมูลของ API นี้เข้ากับ categoryItems เดิม
-          categoryItems.forEach((key, value) {
-            if (updatedCategories.containsKey(key)) {
-              categoryItems[key]!.addAll(updatedCategories[key]!);
-            }
-          });
-          _concertsThaimass = concerts;
-          _isLoading = false;
-        });
-      } else {
-        print('Failed to load concerts: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching concerts: $e');
-    }
-  }
+  // Future<void> fetchZones() async {
+  //   try {
+  //     final response = await http
+  //         .get(Uri.parse('http://192.168.55.228:5000/?concert_id=${concertID.id}'));
+  //     if (response.statusCode == 200) {
+  //       setState(() {
+  //         _zones = jsonDecode(response.body);
+  //         _isLoading = false;
+  //       });
+  //     } else {
+  //       print('Failed to load concerts: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching concerts: $e');
+  //   }
+  // }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _controller.removeListener(_onPageChanged);
+    _timer.cancel(); 
     super.dispose();
   }
 
-  void _startAutoScroll() {
-    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
-      if (_controller.hasClients) {
-        final nextPage = (_controller.page!.toInt() + 1) % 10;
-        _controller.animateToPage(
-          nextPage,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
+  // เพิ่มตัวแปรสีตามโซน
+  Map<String, Color> zoneColors = {
+    'STD': Colors.pinkAccent,
+  };
+
+  void startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingTime > 0) {
+        setState(() {
+          _remainingTime--;
+        });
+      } else {
+        _timer.cancel();
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('หมดเวลาทำรายการ'),
+            content: const Text('กรุณาเริ่มการจองใหม่'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('ตกลง'),
+              ),
+            ],
+          ),
         );
       }
     });
   }
 
-  void _onPageChanged() {
-    final page = _controller.page?.round() ?? 0;
-    if (page == 3) {
-      _controller.animateToPage(
-        0,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
+  String formatTime(int seconds) {
+    final int minutes = seconds ~/ 60;
+    final int secs = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background Gradient
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFFEECDA3), Color(0xFFEF629F)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-          // Page Content
-          Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween, 
-                      crossAxisAlignment: CrossAxisAlignment.center, 
-                      children: [
-                        Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "ʙᴇꜱᴛ ᴘʀᴏᴅᴜᴄᴛꜱ",
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 251, 64, 204),
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Stack(
-                              children: [
-                                Icon(Icons.favorite,
-                                    color: Colors.pink[50], size: 28),
-                                if (favoriteCount >
-                                    0) // แสดงเฉพาะเมื่อ favoriteCount > 0
-                                  Positioned(
-                                    right: -50,
-                                    top: 0,
-                                    child: Container(
-                                      padding: EdgeInsets.all(4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Text(
-                                        '$favoriteCount',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.shopping_cart,
-                                color: Colors.white, size: 28),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+  void updatePrice(String price) {
+    setState(() {
+      selectedPrice = price;
 
-                  const SizedBox(height: 20),
-                  // Search Bar
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Container(
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25.0),
-                        color: Colors.white,
-                      ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          hintText: 'Search ...',
-                          hintStyle: TextStyle(
-                            color: Colors.black54,
-                          ),
-                          prefixIcon: Icon(Icons.search, color: Colors.black),
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 16.0),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Content Box with Carousel
-                  Container(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 220,
-                          child: PageView(
-                            controller: _controller,
-                            children: _ProductImages.map((ProductImages) {
-                              return buildCarouselItem(
-                                ProductImages['image'] ?? 'assets/default.jpg',
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildTypeButton(
-                        'CONCERT', const Color.fromARGB(255, 243, 33, 163)),
-                    SizedBox(width: 40),
-                    _buildTypeButton(
-                        'SPORT', const Color.fromARGB(255, 76, 127, 175)),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: selectedType == 'CONCERT'
-                        ? _buildConcertCategories()
-                        : _buildSportCategories(),
-                  ),
-                ),
-               
-                        SizedBox(height: 30),
-                        Container(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                             
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        // Content List
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Column(
-                            children: (_isLoading
-                                    ? [] // ถ้ายังโหลดข้อมูลอยู่ ให้แสดงเป็นค่าว่าง
-                                    : categoryItems[selectedCategory] ??
-                                        []) // ใช้ข้อมูลจาก selectedCategory
-                                .map((item) => buildImageWithTextAndBox(
-                                    item)) // แปลงแต่ละ item เป็น widget
-                                .toList(),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+      // อัปเดตรายการโซนตามราคา
+      if (price == "฿3,500") {
+        seatZones = ['BB1', 'BB2', 'BB3', 'BB4', 'BB5', 'BB6'];
+      } else if (price == "฿5,500") {
+        seatZones = ['AA1', 'AA2', 'AA3'];
+      } else if (price == "฿4,500") {
+        seatZones = ['AA4', 'AA5', 'AA6'];
+      } else if (price == "฿2,500") {
+        seatZones = ['STD'];
+      }
+
+      // ตรวจสอบให้ seatPrices มีจำนวนรายการเท่ากับ seatZones
+      seatPrices = List.generate(seatZones.length, (index) => price);
+    });
+  }
+
+  void _bookSeat(String zone) {
+    setState(() {
+      selectedZone = zone;
+    });
+
+    // เมื่อเลือกโซน จะนำทางไปยังหน้ารายละเอียดของโซนที่เลือก
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ZoneDetailPage(
+          zoneName: zone,
+          selectedPrice: selectedPrice,
+          imagePath: widget.imagePath,
+          concertName: widget.concertName,
+          date: widget.date,
+          time: widget.time,
+          location: widget.location,
+        ),
       ),
     );
   }
 
-    Widget _buildCircularImageWithText(String imagePath, String category) {
+  Widget buildPriceButton(String price, Color color) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          selectedCategory = category;
-        });
-      },
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 33,
-            backgroundImage: AssetImage(imagePath),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            category,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _buildTypeButton(String type, Color color) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedType = type;
-          selectedCategory = 'Flash Sales';
-        });
+        updatePrice(price);
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         decoration: BoxDecoration(
-          color: color,
+          color: selectedPrice == price ? color : Colors.grey[300],
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.black, width: 1),
         ),
         child: Text(
-          type,
+          price,
           style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
+            color: selectedPrice == price ? Colors.white : Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -452,154 +192,203 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+Widget buildSeatContainers() {
+  return Column(
+    children: _zones.map((zone) {
+      // print("🎟️ แสดงข้อมูลโซน: $zone"); // ✅ เช็คค่าแต่ละโซน
+      
+      String zoneName = zone['name'] ?? 'Unknown'; // ตั้งค่าเริ่มต้น
+      String seatCount = zone['seat_count']?.toString() ?? 'N/A';
+      Color zoneColor = zoneColors[zoneName] ?? Colors.grey; // ป้องกันสี null
 
-  Widget buildCarouselItem(String imagePath) {
-    String imageUrl = 'http://192.168.55.228/product/$imagePath';
-
-    return Container(
-      margin: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: imageUrl.startsWith('http')
-              ? NetworkImage(imageUrl) // ถ้าเป็น URL ใช้ NetworkImage
-              : AssetImage(imageUrl)
-                  as ImageProvider, // ถ้าไม่ใช่ URL ใช้ AssetImage
-          fit: BoxFit.cover,
-        ),
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-    );
-  }
-
-  Widget buildImageWithTextAndBox(Map<String, String> item) {
-    // กำหนด URL ของรูปภาพ
-
-    String imageUrl = 'http://192.168.55.228/concert/all/' + item['imagePath']!;
-
-    return GestureDetector(
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16.0),
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Color(int.parse(item['boxColor']!)),
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Row(
-          children: [
-            // ใช้ Image.network แทน NetworkImage
-            ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Container(
-                width: 100,
-                height: 140,
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) {
-                      return child; // ถ้าภาพโหลดเสร็จแล้ว ให้แสดงภาพเลย
-                    } else {
-                      // ถ้ายังโหลดไม่เสร็จ ให้แสดง CircularProgressIndicator
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  (loadingProgress.expectedTotalBytes ?? 1)
-                              : null,
-                        ),
-                      );
-                    }
-                  },
-                ),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Container(
+          width: 360,
+          height: 80,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: zoneColor,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                blurRadius: 7,
+                offset: const Offset(0, 3),
               ),
-            ),
-            const SizedBox(width: 8.0),
-            Expanded(
-              child: Column(
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item['text1']!, // ชื่อคอนเสิร์ต
-                    style: TextStyle(
-                      color: Color(int.parse(item['textColor']!)),
+                    zoneName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: 20,
                     ),
                   ),
-                  Row(
-                    children: [
-                      Icon(Icons.timer_sharp, size: 16, color: Colors.blue),
-                      SizedBox(width: 4),
-                      Text(
-                        item['text3']!, // วัน
-                        style: TextStyle(
-                          color: Color(int.parse(item['textColor']!)),
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  Row(
-                    children: [
-                      Icon(Icons.push_pin, size: 16, color: Colors.red),
-                      SizedBox(width: 4),
-                      Expanded(
-                        // ใช้ Expanded เพื่อให้ข้อความยืดออกไปได้
-                        child: Text(
-                          item['text4']!, // สถานที่
-                          style: TextStyle(
-                            color: Color(int.parse(item['textColor']!)),
-                            fontSize: 16,
-                          ),
-                          softWrap:
-                              true, // จะทำให้ข้อความขึ้นบรรทัดใหม่ถ้ายาวเกิน
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 8),
-                  // Add the 'Buy Tickets' button
-                  ElevatedButton(
-                    onPressed: () {
-                      // ตรวจสอบค่า
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ConcertDetail(
-                            imagePath: imageUrl, // เปลี่ยนเป็น URL เต็ม
-                            text1: item['text1']!,
-                            text2: item['text2']!,
-                            text3: item['text3']!,
-                            text4: item['text4']!,
-                            text5: item['text5'] ?? 'ไม่มีข้อมูล',
-                          ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 255, 29, 13),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 5.0, horizontal: 25.0),
-                    ),
-                    child: Text(
-                      'ซื้อบัตร',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Text(
+                    "฿$seatCount",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
                     ),
                   ),
                 ],
               ),
+              ElevatedButton(
+                onPressed: () {
+                  _bookSeat(zoneName);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text(
+                  "จองโซนที่นั่ง",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }).toList(),
+  );
+}
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('แผนผังโซนที่นั่ง'),
+    ),
+    body: Container(
+      width: double.infinity,
+      height: double.infinity, // ยืดเต็มหน้าจอ
+      color: Colors.white, // พื้นหลังขาว
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Timer
+            Text(
+              "เวลาที่ทำรายการ: ${formatTime(_remainingTime)}",
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            const SizedBox(height: 10),
+
+            // Stage
+            Container(
+              height: 50,
+              width: 250,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.pinkAccent,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: const Text(
+                "STAGE",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // โซนที่นั่ง
+            buildZoneRow(['AA1', 'AA2', 'AA3'], Colors.pinkAccent, Colors.white),
+            const SizedBox(height: 10),
+            buildZoneRow(['AA4', 'AA5', 'AA6'], Colors.yellow, Colors.black),
+            const SizedBox(height: 10),
+            buildZoneRow(['BB1', 'BB2', 'BB3', 'BB4', 'BB5', 'BB6'],
+                Colors.lightBlueAccent, Colors.black),
+
+            const SizedBox(height: 20),
+
+            // STD Zone
+            Container(
+              height: 40,
+              width: double.infinity,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                "STD",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // แสดง Loading Indicator หรือ รายการโซนที่โหลดมา
+           _isLoading
+  ? const CircularProgressIndicator() // กำลังโหลด
+  : buildSeatContainers(), // โหลดเสร็จ แสดงโซน
+
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+}
+
+
+Widget buildZoneRow(List<String> zones, Color color, Color textColor) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: zones
+        .map(
+          (zone) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: GestureDetector(
+              onTap: () {
+                debugPrint("Selected Zone: $zone");
+              },
+              child: Container(
+                width: 50,
+                height: 50,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black, width: 1),
+                ),
+                child: Text(
+                  zone,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+        .toList(),
+  );
 }

@@ -370,8 +370,7 @@ class _DiscountState extends State<Discount> {
                           child: Row(
                             children: _promotionDetail.map((promotionDetail) {
                               return buildImageWithText(
-                                promotionDetail['image'] ??
-                                    'assets/default.jpg',
+                                promotionDetail['image'] ??'assets/default.jpg',
                                 promotionDetail['name'] ?? 'Unknown Name',
                                 promotionDetail['oldPrice'] ?? '\$0.00',
                                 promotionDetail['newPrice'] ?? '\$0.00',

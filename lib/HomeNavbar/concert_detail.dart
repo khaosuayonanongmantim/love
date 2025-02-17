@@ -88,7 +88,6 @@ class ConcertDetail extends StatelessWidget {
                           },
                         ),
                       ),
-                   
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -235,12 +234,12 @@ class ConcertDetail extends StatelessWidget {
                                   date: formattedDate,
                                   time: text3,
                                   location: text4,
+                                  price: text5, // ส่ง concertID หรือเปลี่ยนเป็นค่าอื่น ๆ ตามต้องการ
                                 ),
                               ),
-                              
                             );
                           },
-                           style: ElevatedButton.styleFrom(
+                          style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 const Color.fromARGB(255, 255, 41, 26),
                             shape: RoundedRectangleBorder(
@@ -257,7 +256,6 @@ class ConcertDetail extends StatelessWidget {
                             ),
                           ),
                         )
-                     
                       ],
                     ),
                   ),
