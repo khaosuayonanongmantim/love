@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:project_new/HomeNavbar/BookingSummaryPageCon.dart';
 
@@ -10,6 +12,8 @@ class ZoneDetailPage extends StatefulWidget {
   final String date;
   final String time;
   final String location;
+  final String price;
+  final int concertId;
 
   const ZoneDetailPage({
     Key? key,
@@ -20,6 +24,8 @@ class ZoneDetailPage extends StatefulWidget {
     required this.date,
     required this.time,
     required this.location,
+    required this.price,
+    required this.concertId,
   }) : super(key: key);
 
   @override
@@ -29,6 +35,8 @@ class ZoneDetailPage extends StatefulWidget {
 class _ZoneDetailPageState extends State<ZoneDetailPage> {
   List<bool> seats = List.generate(100, (_) => false); // Seat statuses
   List<String> selectedSeats = []; // Track selected seats
+  List<dynamic> _Seat = [];
+  bool _isLoading = true;
 
   // Timer for countdown
   late Timer _timer;
@@ -37,7 +45,102 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
   @override
   void initState() {
     super.initState();
+    fetchSeat(widget.zoneName, widget.concertId);
+// 🔹 ส่งค่าโซนไปดึงข้อมูลที่นั่งจาก API
     startTimer();
+  }
+Future<int?> fetchZoneId(String concertZoneName, int concertId) async {
+  try {
+    final response = await http.get(Uri.parse(
+        'http://192.168.55.228:5000/getZones?name=$concertZoneName&concert_id=$concertId'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> zones = json.decode(response.body);
+      
+      for (var zone in zones) {
+        if (zone['name'] == concertZoneName && zone['concert_id'] == concertId) {
+          return zone['id'];  // คืนค่า zone_id ที่ถูกต้อง
+        }
+      }
+    }
+  } catch (e) {
+    print('❌ Error fetching zone ID: $e');
+  }
+  return null; // ถ้าไม่เจอ zoneId
+}
+
+Future<void> fetchSeat(String concertZoneName, int concertId) async {
+  try {
+    print("📡 Fetching zone ID for: $concertZoneName");
+    
+    int? zoneId = await fetchZoneId(concertZoneName, concertId);
+    
+    if (zoneId == null) {
+      throw Exception('❌ ไม่พบ zoneId สำหรับโซน: $concertZoneName');
+    }
+
+    final response = await http.get(Uri.parse('http://192.168.55.228:5000/api/seats/$zoneId'));
+
+    print("🚀 API Response Code: ${response.statusCode}");
+    print("📥 API Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      setState(() {
+        _Seat = data.map((seat) => {
+          "id": seat["id"],
+          "zone_id": seat["zone_id"],
+          "seat_number": seat["seat_number"],
+          "is_reserved": seat["is_reserved"]
+        }).toList();
+        _isLoading = false;
+      });
+    } else {
+      throw Exception('❌ ไม่สามารถโหลดข้อมูลที่นั่งได้');
+    }
+  } catch (e) {
+    print('❌ Error fetching seats: $e');
+  }
+}
+
+  Future<void> updateSeatStatus(String seatNumber, int status) async {
+    final url = Uri.parse("http://192.168.55.228:5000/api/update-seat");
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"seatNumber": seatNumber, "status": status}),
+    );
+
+    if (response.statusCode == 200) {
+      print("Seat updated successfully!");
+    } else {
+      print("Failed to update seat: ${response.body}");
+    }
+  }
+
+  Future<void> bookSeats(String userId, int concertId, int zoneId,
+      List<String> selectedSeats, double totalPrice) async {
+    final url = Uri.parse("http://192.168.55.228:5000/api/book-seats");
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "userId": userId,
+        "concertId": concertId,
+        "zoneId": zoneId,
+        "selectedSeats": selectedSeats,
+        "total_price": totalPrice,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print("Booking successful!");
+    } else {
+      print("Booking failed: ${response.body}");
+    }
   }
 
   @override
@@ -89,40 +192,35 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 
-  Map<String, double> calculateTotalPrice() {
-    try {
-      // ล้างข้อมูล widget.selectedPrice ให้แน่ใจว่าไม่มีปัญหา
-      String cleanedPrice = widget.selectedPrice
-          .replaceAll(RegExp(r'[^\d.]'), ''); // เก็บเฉพาะตัวเลขและจุดทศนิยม
-      double ticketPrice = double.tryParse(cleanedPrice) ?? 0.0;
+ Map<String, double> calculateTotalPrice() {
+  try {
+    // ใช้ค่า price จาก widget โดยตรง
+    double ticketPrice = double.tryParse(widget.price) ?? 0.0;
+    int selectedCount = selectedSeats.length;
+    double totalSeatPrice = ticketPrice * selectedCount;
 
-      // ตรวจสอบค่า selectedSeats ว่ามีจำนวนถูกต้อง
-      int selectedCount = selectedSeats.length;
-      double totalSeatPrice = ticketPrice * selectedCount;
+    // คำนวณ VAT (7%) และค่าธรรมเนียม (7%)
+    const double vatRate = 0.07;
+    const double serviceFeeRate = 0.07;
 
-      // คำนวณ VAT และค่าธรรมเนียมบริการ
-      const double vatRate = 0.07; // VAT 7%
-      const double serviceFeeRate = 0.07 * 1.07; // ค่าธรรมเนียม 5%
+    double vatAmount = totalSeatPrice * vatRate;
+    double serviceFee = totalSeatPrice * serviceFeeRate;
+    double totalPrice = totalSeatPrice + vatAmount + serviceFee;
 
-      double vatAmount = totalSeatPrice * vatRate;
-      double serviceFee = totalSeatPrice * serviceFeeRate;
-      double totalPrice = totalSeatPrice + vatAmount + serviceFee;
-
-      // คืนค่าทั้งหมด
-      return {
-        "totalPrice": totalPrice,
-        "vatAmount": vatAmount,
-        "serviceFee": serviceFee,
-      };
-    } catch (e) {
-      print("Error calculating total price: $e");
-      return {
-        "totalPrice": 0.0,
-        "vatAmount": 0.0,
-        "serviceFee": 0.0,
-      };
-    }
+    return {
+      "totalPrice": totalPrice,
+      "vatAmount": vatAmount,
+      "serviceFee": serviceFee,
+    };
+  } catch (e) {
+    print("❌ Error calculating total price: $e");
+    return {
+      "totalPrice": 0.0,
+      "vatAmount": 0.0,
+      "serviceFee": 0.0,
+    };
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -162,14 +260,11 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                   ),
                   const SizedBox(height: 10), // ระยะห่างระหว่างแถว
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(
                           child: _buildLegendItem(
                               Colors.grey, 'ที่นั่งถูกจองแล้ว')),
-                      Expanded(
-                          child: _buildLegendItem(
-                              Colors.red, 'ที่นั่งที่ชำระเงินแล้ว')),
                     ],
                   ),
                 ],
@@ -202,27 +297,46 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                 ),
-                itemCount: 100,
+                itemCount:
+                    _Seat.isEmpty ? 1 : _Seat.length, // ตรวจสอบจำนวนที่นั่ง
                 itemBuilder: (context, index) {
-                  String seatLabel =
-                      '${widget.zoneName}${(index ~/ 10) + 1}-${(index % 10) + 1}';
+                  if (_Seat.isEmpty) {
+                    return Center(
+                        child: Text("ไม่มีข้อมูลที่นั่ง",
+                            style: TextStyle(color: Colors.red)));
+                  }
+
+                  var seat = _Seat[index];
+                  String seatLabel = seat['seat_number'] ?? "N/A";
+                  bool isBooked =
+                      seat['is_reserved'] == true || seat['is_reserved'] == 1;
+                  bool isPaid =
+                      seat['seat_number'] == true || seat['is_paid'] == 1;
+                  bool isSelected = selectedSeats.contains(seatLabel);
 
                   return GestureDetector(
                     onTap: () {
-                      setState(() {
-                        seats[index] = !seats[index];
-                        if (seats[index]) {
-                          selectedSeats.add(seatLabel);
-                        } else {
-                          selectedSeats.remove(seatLabel);
-                        }
-                        // เรียกคำนวณราคารวมใหม่
-                        print("Updated Total Price: ${calculateTotalPrice()}");
-                      });
+                      if (!isBooked && !isPaid) {
+                        setState(() {
+                          if (isSelected) {
+                            selectedSeats.remove(seatLabel);
+                          } else {
+                            selectedSeats.add(seatLabel);
+                          }
+                          print(
+                              "Updated Total Price: ${calculateTotalPrice()}");
+                        });
+                      }
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: seats[index] ? Colors.green : Colors.blue,
+                        color: isPaid
+                            ? Colors.red // 🔴 ชำระเงินแล้ว
+                            : isBooked
+                                ? Colors.grey // 🔘 จองแล้ว
+                                : isSelected
+                                    ? Colors.green // ✅ ที่นั่งที่เลือก
+                                    : Colors.blue, // 🔵 ว่าง
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: const [
                           BoxShadow(
@@ -236,6 +350,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                   );
                 },
               ),
+
               const SizedBox(height: 20),
 
               // Selected zone and price
@@ -246,7 +361,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
               ),
               const SizedBox(height: 10),
               Text(
-                'ราคา: ${widget.selectedPrice}',
+                'ราคา: ${widget.price}',
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -264,7 +379,9 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
 
               // Total price
               Text(
-                'ราคารวม: ฿${calculateTotalPrice()["totalPrice"]!.toStringAsFixed(2)}',
+                //'ราคารวม: ฿${(double.tryParse(widget.price)! * selectedSeats.length).toStringAsFixed(2)}',
+                 'ราคารวม: ฿${calculateTotalPrice()["totalPrice"]!.toStringAsFixed(2)}',
+
                 style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

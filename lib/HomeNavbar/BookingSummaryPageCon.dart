@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:project_new/Payment/ReceiptConSportPage.dart';
-// import 'package:project_new/Payment/ReceiptConSportPage.dart';
 
 class BookingSummaryPageCon extends StatefulWidget {
   final String concertName;
@@ -17,7 +18,7 @@ class BookingSummaryPageCon extends StatefulWidget {
   final double serviceFee;
   final String imagePath; // เพิ่มตัวแปรรับรูปภาพ
 
-  const BookingSummaryPageCon({
+    const BookingSummaryPageCon({
     Key? key,
     required this.concertName,
     required this.date,
@@ -30,23 +31,28 @@ class BookingSummaryPageCon extends StatefulWidget {
     required this.serviceFee,
     required this.imagePath, // รับค่ารูปภาพจาก ZoneDetailPage
   }) : super(key: key);
-
+  
   @override
-  State<BookingSummaryPageCon> createState() => _BookingSummaryPageConState();
+  _BookingSummaryPageConState createState() => _BookingSummaryPageConState();
 }
 
 class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+
   bool isChecked = false; // จัดการสถานะของ Checkbox
   File? selectedImage;
 
-  // ตัวแปรสำหรับเก็บค่าฟอร์มของบัตรเครดิต
+    // ตัวแปรสำหรับเก็บค่าฟอร์มของบัตรเครดิต
   final TextEditingController cardNumberController = TextEditingController();
   final TextEditingController cardHolderController = TextEditingController();
   final TextEditingController cvvController = TextEditingController();
   String? selectedMonth;
   String? selectedYear;
 
-  String formatDate(String dateString) {
+    String formatDate(String dateString) {
     try {
       DateTime dateTime = DateTime.parse(dateString);
       return DateFormat('dd/MM/yyyy').format(dateTime);
@@ -55,7 +61,7 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
     }
   }
 
-  Future<void> _pickImage() async {
+    Future<void> _pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -65,7 +71,7 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
     }
   }
 
-  // ฟังก์ชันตรวจสอบฟอร์มบัตรเครดิต
+   // ฟังก์ชันตรวจสอบฟอร์มบัตรเครดิต
   bool _validateCardForm() {
     return cardNumberController.text.isNotEmpty &&
         cardHolderController.text.isNotEmpty &&
@@ -74,21 +80,44 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
         selectedYear != null;
   }
 
+
+  bool _isLoading = true; // เพิ่มตัวแสดง Loading
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+Future<void> _loadUserData() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  setState(() {
+    _firstNameController.text = prefs.getString('firstName') ?? '';
+    _lastNameController.text = prefs.getString('lastName') ?? '';
+    _phoneController.text = prefs.getString('phone') ?? '';
+    _emailController.text = prefs.getString('email') ?? '';
+    _isLoading = false;
+  });
+}
   @override
   Widget build(BuildContext context) {
-    String formattedDate = formatDate(widget.date);
+        String formattedDate = formatDate(widget.date);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('สรุปการจอง'),
-        backgroundColor: Colors.pinkAccent,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ข้อมูลผู้ซื้อบัตร
-            Container(
+        title: const Text("สรุปการจอง"),
+         backgroundColor: Colors.pinkAccent,
+        ),
+      
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator()) // แสดง Loading
+          : SingleChildScrollView(
+      
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Colors.orange[100],
@@ -106,33 +135,28 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: const [
+                 Row(
+                    children: [
                       Expanded(
                         child: TextField(
-                          decoration: InputDecoration(
-                            labelText: 'ชื่อ',
-                            border: OutlineInputBorder(),
-                          ),
+                          controller: _firstNameController,
+                          decoration: const InputDecoration(labelText: 'ชื่อ', border: OutlineInputBorder()),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
-                          decoration: InputDecoration(
-                            labelText: 'นามสกุล',
-                            border: OutlineInputBorder(),
-                          ),
+                          controller: _lastNameController,
+                          decoration: const InputDecoration(labelText: 'นามสกุล', border: OutlineInputBorder()),
                         ),
                       ),
                     ],
                   ),
+                 
                   const SizedBox(height: 10),
-                  TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'เบอร์โทรศัพท์',
-                      border: OutlineInputBorder(),
-                    ),
+               TextField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(labelText: 'อีเมล', border: OutlineInputBorder()),
                   ),
                   const SizedBox(height: 10),
                   TextField(
@@ -144,9 +168,9 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-
-            // สรุปรายการสั่งซื้อ
+         
+                  const SizedBox(height: 20),
+                   // สรุปรายการสั่งซื้อ
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -269,10 +293,8 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
                 ],
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            // เงื่อนไขและการชำระเงิน
+const SizedBox(height: 20),
+  // เงื่อนไขและการชำระเงิน
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -320,8 +342,7 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
               ),
             ),
             const SizedBox(height: 20),
-
-            ExpansionTile(
+              ExpansionTile(
               title: const Text('เดบิต/เครดิตการ์ด',
                   style: TextStyle(color: Colors.red)),
               children: [
@@ -482,7 +503,7 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
                 ),
               ],
             ),
-            ExpansionTile(
+          ExpansionTile(
               title:
                   const Text('พร้อมเพย์', style: TextStyle(color: Colors.red)),
               children: [
@@ -626,9 +647,13 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
                 ),
               ],
             )
-          ],
-        ),
-      ),
+         
+                ],
+                
+              ),
+              
+            ),
+            
     );
   }
 }

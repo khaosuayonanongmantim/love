@@ -31,10 +31,9 @@ class _ConcertPlanState extends State<ConcertPlan> {
   int _remainingTime = 300; // ตั้งค่าเวลานับถอยหลัง (300 วินาที = 5 นาที)
   String selectedPrice = "฿2,500"; // ราคาเริ่มต้นที่เลือก
   String selectedZone = "STD"; // โซนที่เลือก
-  List<String> seatZones = ['STD']; // รายการโซนที่แสดงผล
   List<String> seatPrices = [];
   List<dynamic> _zones = [];
-  String? selectedConcertID;  // เพิ่มตัวแปรเพื่อเก็บ concertID ที่เลือก
+  String? selectedConcertID;  
   List<dynamic> concerts = [];
   bool _isLoading = true;
 
@@ -82,24 +81,6 @@ Future<void> fetchZones(String concertID) async {
   }
 }
 
-
-  // Future<void> fetchZones() async {
-  //   try {
-  //     final response = await http
-  //         .get(Uri.parse('http://192.168.55.228:5000/?concert_id=${concertID.id}'));
-  //     if (response.statusCode == 200) {
-  //       setState(() {
-  //         _zones = jsonDecode(response.body);
-  //         _isLoading = false;
-  //       });
-  //     } else {
-  //       print('Failed to load concerts: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching concerts: $e');
-  //   }
-  // }
-
   @override
   void dispose() {
     _timer.cancel(); 
@@ -107,9 +88,7 @@ Future<void> fetchZones(String concertID) async {
   }
 
   // เพิ่มตัวแปรสีตามโซน
-  Map<String, Color> zoneColors = {
-    'STD': Colors.pinkAccent,
-  };
+  Map<String, Color> zoneColors = {};
 
   void startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -144,87 +123,51 @@ Future<void> fetchZones(String concertID) async {
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
-  void updatePrice(String price) {
-    setState(() {
-      selectedPrice = price;
 
-      // อัปเดตรายการโซนตามราคา
-      if (price == "฿3,500") {
-        seatZones = ['BB1', 'BB2', 'BB3', 'BB4', 'BB5', 'BB6'];
-      } else if (price == "฿5,500") {
-        seatZones = ['AA1', 'AA2', 'AA3'];
-      } else if (price == "฿4,500") {
-        seatZones = ['AA4', 'AA5', 'AA6'];
-      } else if (price == "฿2,500") {
-        seatZones = ['STD'];
-      }
-
-      // ตรวจสอบให้ seatPrices มีจำนวนรายการเท่ากับ seatZones
-      seatPrices = List.generate(seatZones.length, (index) => price);
-    });
+ void _bookSeat(String zone) {
+  if (selectedConcertID == null) {
+    print("❌ กรุณาเลือกคอนเสิร์ตก่อนทำการจอง");
+    return;
   }
 
-  void _bookSeat(String zone) {
-    setState(() {
-      selectedZone = zone;
-    });
+  setState(() {
+    selectedZone = zone;
+  });
 
     // เมื่อเลือกโซน จะนำทางไปยังหน้ารายละเอียดของโซนที่เลือก
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ZoneDetailPage(
-          zoneName: zone,
-          selectedPrice: selectedPrice,
-          imagePath: widget.imagePath,
-          concertName: widget.concertName,
-          date: widget.date,
-          time: widget.time,
-          location: widget.location,
+        concertId: int.parse(selectedConcertID!), // ✅ ใช้ค่า selectedConcertID
+        zoneName: zone,
+        selectedPrice: selectedPrice,
+        imagePath: widget.imagePath,
+        concertName: widget.concertName,
+        date: widget.date,
+        time: widget.time,
+        location: widget.location,
+        price: widget.price,
         ),
       ),
     );
   }
 
-  Widget buildPriceButton(String price, Color color) {
-    return GestureDetector(
-      onTap: () {
-        updatePrice(price);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        decoration: BoxDecoration(
-          color: selectedPrice == price ? color : Colors.grey[300],
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.black, width: 1),
-        ),
-        child: Text(
-          price,
-          style: TextStyle(
-            color: selectedPrice == price ? Colors.white : Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
+  
 
-Widget buildSeatContainers() {
+Widget buildSeatContainers(String price) {
   return Column(
-    children: _zones.map((zone) {
-      String zoneName = zone['name'] ?? 'Unknown';
-      String seatCount = zone['seat_count']?.toString() ?? 'N/A';
-      Color zoneColor = zoneColors[zoneName] ?? Color.fromARGB(255, 255, 34, 100);
-
-      return Padding(
+    children: [
+      // 🔹 เพิ่มกล่อง STAGE ด้านบน
+      Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Container(
           width: 360,
-          height: 80,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          height: 70,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: zoneColor,
-            borderRadius: BorderRadius.circular(15),
+            color: Colors.pink, // สีชมพูให้เด่นขึ้น
+            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
@@ -233,52 +176,115 @@ Widget buildSeatContainers() {
               ),
             ],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    zoneName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
+          child: const Text(
+            "STAGE",
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+
+      // 🔹 แสดงกล่องโซนเล็กๆ ใต้ STAGE
+      Wrap(
+        spacing: 8, // ระยะห่างระหว่างกล่อง
+        runSpacing: 8, // ระยะห่างระหว่างบรรทัด
+        children: _zones.map((zone) {
+          String zoneName = zone['name'] ?? 'Unknown';
+          Color zoneColor = zoneColors[zoneName] ?? Color.fromARGB(255, 243, 98, 141);
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            decoration: BoxDecoration(
+              color: zoneColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              "$zoneName - $price",
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+const Divider(color: Colors.grey, thickness: 1),
+      const SizedBox(height: 10), // ระยะห่าง
+
+      // 🔹 แสดงโซนที่นั่งแบบใหญ่
+      ..._zones.map((zone) {
+        String zoneName = zone['name'] ?? 'Unknown';
+        String seatCount = zone['seat_count']?.toString() ?? 'N/A';
+        Color zoneColor = zoneColors[zoneName] ?? const Color.fromARGB(255, 233, 59, 111);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Container(
+            width: 360,
+            height: 80,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: zoneColor,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  blurRadius: 7,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      zoneName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "ที่นั่ง $seatCount ราคา $price",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _bookSeat(zoneName);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text(
+                    "จองโซนที่นั่ง",
+                    style: TextStyle(
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(
-                    "฿$seatCount",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _bookSeat(zoneName);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
                 ),
-                child: const Text(
-                  "จองโซนที่นั่ง",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    }).toList(),
+        );
+      }).toList(),
+    ],
   );
 }
 
@@ -287,11 +293,12 @@ Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
       title: const Text('แผนผังโซนที่นั่ง'),
+       backgroundColor: const Color.fromARGB(255, 255, 135, 175),
     ),
     body: Container(
       width: double.infinity,
       height: double.infinity,
-      color: Colors.white,
+      color: Color(0xFFFFE4E1),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -319,7 +326,8 @@ Widget build(BuildContext context) {
             // แสดงข้อมูลโซน
             _isLoading
                 ? const CircularProgressIndicator()
-                : buildSeatContainers(),  // แสดงโซนหากโหลดเสร็จ
+                : buildSeatContainers(widget.price),  // ✅ ส่ง widget.price เข้าไป
+  // แสดงโซนหากโหลดเสร็จ
           ],
         ),
       ),
@@ -328,40 +336,4 @@ Widget build(BuildContext context) {
   );
 }
 
-
-Widget buildZoneRow(List<String> zones, Color color, Color textColor) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: zones
-        .map(
-          (zone) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: GestureDetector(
-              onTap: () {
-                debugPrint("Selected Zone: $zone");
-              },
-              child: Container(
-                width: 50,
-                height: 50,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.black, width: 1),
-                ),
-                child: Text(
-                  zone,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        )
-        .toList(),
-  );
-}
 }

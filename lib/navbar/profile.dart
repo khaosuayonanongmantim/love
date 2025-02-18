@@ -1,8 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({super.key});
 
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  String _firstName = "";
+  String _lastName = "";
+  String _email = "";
+
+    @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+    Future<void> _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _firstName = prefs.getString('firstName') ?? "Unknown";
+      _lastName = prefs.getString('lastName') ?? "";
+      _email = prefs.getString('email') ?? "No Email";
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,9 +96,12 @@ class Profile extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // User Details
-                  const Text(
-                    '☞ Lalinda ☜',
-                    style: TextStyle(
+                 const SizedBox(height: 20),
+
+                  // Display User Name & Email
+                  Text(
+                    '☞ $_firstName $_lastName ☜',
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -81,9 +109,9 @@ class Profile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'linda587@example.com',
-                    style: TextStyle(
+                  Text(
+                    _email,
+                    style: const TextStyle(
                       fontSize: 18,
                       color: Colors.white70,
                       fontStyle: FontStyle.italic,

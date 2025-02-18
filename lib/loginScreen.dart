@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_new/bottom_navber.dart';
 import 'package:project_new/regScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -33,8 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     return; // หยุดการทำงานถ้ากรอกข้อมูลไม่ครบ
   }
-// http://127.0.0.1/
-// 172.18.121.190:5000
    final String apiUrl = "http://192.168.55.228:5000/login";
   try {
     final response = await http.post(
@@ -56,24 +55,31 @@ class _LoginScreenState extends State<LoginScreen> {
   // print("Parsed User: ${data['user']}");
 
   if (data['role'] == "user") {
-    String firstName = data['first_name'] ?? "User"; // Handle null values
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Welcome, $firstName")),
-    );
+        // ⭐ บันทึกข้อมูลลง SharedPreferences ⭐
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('firstName', data['first_name'] ?? '');
+        await prefs.setString('lastName', data['last_name'] ?? '');
+        await prefs.setString('phone', data['phone'] ?? '');
+        await prefs.setString('email', data['email'] ?? '');
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => BottomNavbar()),
-    );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Welcome, ${data['first_name']}")),
+        );
+
+
+   Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => BottomNavbar()),
+        );
   } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error: Invalid role.")),
-    );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: Invalid role.")),
+        );
   }
 } else {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text("Error: ${response.statusCode}")),
-  );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${response.statusCode}")),
+      );
 }
 
   } catch (e) {
