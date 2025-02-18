@@ -31,7 +31,6 @@ class _ConcertPlanState extends State<ConcertPlan> {
   int _remainingTime = 300; // ตั้งค่าเวลานับถอยหลัง (300 วินาที = 5 นาที)
   String selectedPrice = "฿2,500"; // ราคาเริ่มต้นที่เลือก
   String selectedZone = "STD"; // โซนที่เลือก
-  List<String> seatPrices = [];
   List<dynamic> _zones = [];
   String? selectedConcertID;  
   List<dynamic> concerts = [];
@@ -139,7 +138,7 @@ Future<void> fetchZones(String concertID) async {
       context,
       MaterialPageRoute(
         builder: (context) => ZoneDetailPage(
-        concertId: int.parse(selectedConcertID!), // ✅ ใช้ค่า selectedConcertID
+        concertId: int.parse(selectedConcertID!), // ✅ 
         zoneName: zone,
         selectedPrice: selectedPrice,
         imagePath: widget.imagePath,

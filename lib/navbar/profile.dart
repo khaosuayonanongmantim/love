@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_new/Payment/GalleryPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
@@ -13,13 +14,13 @@ class _ProfileState extends State<Profile> {
   String _lastName = "";
   String _email = "";
 
-    @override
+  @override
   void initState() {
     super.initState();
     _loadUserData();
   }
 
-    Future<void> _loadUserData() async {
+  Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _firstName = prefs.getString('firstName') ?? "Unknown";
@@ -27,7 +28,7 @@ class _ProfileState extends State<Profile> {
       _email = prefs.getString('email') ?? "No Email";
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +84,8 @@ class _ProfileState extends State<Profile> {
                           radius: 25,
                           backgroundColor: Colors.white,
                           child: IconButton(
-                            icon: const Icon(Icons.camera_alt, color: Color(0xFF6200EA), size: 28),
+                            icon: const Icon(Icons.camera_alt,
+                                color: Color(0xFF6200EA), size: 28),
                             onPressed: () {
                               // Add functionality for changing profile picture
                             },
@@ -96,7 +98,7 @@ class _ProfileState extends State<Profile> {
                   const SizedBox(height: 20),
 
                   // User Details
-                 const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
                   // Display User Name & Email
                   Text(
@@ -121,14 +123,17 @@ class _ProfileState extends State<Profile> {
 
                   // Profile Information Cards with onPressed
                   ProfileInfoCard(
-                    icon: Icons.confirmation_number,
-                    title: '𝙍𝙚𝙨𝙚𝙧𝙫𝙚𝙙 𝙏𝙞𝙘𝙠𝙚𝙩𝙨',
-                    info: '2 Tickets for "Concert A"',
+                    icon: Icons.photo_library,
+                    title: 'Gallery',
+                    info: 'ใบเสร็จ',
                     onPressed: () {
-                      // Navigate to the upcoming events page or show details
-                      print("Upcoming Events clicked");
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ImagePickerScreen()));
                     },
                   ),
+
                   ProfileInfoCard(
                     icon: Icons.credit_card,
                     title: '𝗣𝗮𝘆𝗺𝗲𝗻𝘁 𝗠𝗲𝘁𝗵𝗼𝗱',
@@ -168,7 +173,8 @@ class _ProfileState extends State<Profile> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -190,7 +196,8 @@ class _ProfileState extends State<Profile> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFEF5350),
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -217,7 +224,8 @@ class _ProfileState extends State<Profile> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[800],
-                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -289,7 +297,8 @@ class ProfileInfoCard extends StatelessWidget {
               color: Color(0xFF6200EA),
             ),
           ),
-          trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xFF6200EA)),
+          trailing:
+              const Icon(Icons.arrow_forward_ios, color: Color(0xFF6200EA)),
         ),
       ),
     );

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
@@ -51,6 +50,7 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
   final TextEditingController cvvController = TextEditingController();
   String? selectedMonth;
   String? selectedYear;
+  final ImagePicker _picker = ImagePicker();
 
     String formatDate(String dateString) {
     try {
@@ -61,14 +61,40 @@ class _BookingSummaryPageConState extends State<BookingSummaryPageCon> {
     }
   }
 
-    Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
         selectedImage = File(pickedFile.path);
       });
     }
+  }
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text("ถ่ายรูป"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text("เลือกรูปจากแกลเลอรี"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
    // ฟังก์ชันตรวจสอบฟอร์มบัตรเครดิต
@@ -135,7 +161,7 @@ Future<void> _loadUserData() async {
                     ),
                   ),
                   const SizedBox(height: 10),
-                 Row(
+              Row(
                     children: [
                       Expanded(
                         child: TextField(
@@ -155,11 +181,12 @@ Future<void> _loadUserData() async {
                  
                   const SizedBox(height: 10),
                TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(labelText: 'อีเมล', border: OutlineInputBorder()),
+                    controller: _phoneController,
+                    decoration: const InputDecoration(labelText: 'เบอร์โทร', border: OutlineInputBorder()),
                   ),
                   const SizedBox(height: 10),
                   TextField(
+                    controller: _emailController,
                     decoration: const InputDecoration(
                       labelText: 'อีเมล',
                       border: OutlineInputBorder(),
@@ -457,7 +484,6 @@ const SizedBox(height: 20),
                                                       ReceiptConSportPage(
                                                     concertName:widget.concertName,
                                                     date: widget.date,
-                                                    imagePath: widget.imagePath,
                                                     time: widget.time,
                                                     location: widget.location,
                                                     zoneName: widget.zoneName,
@@ -570,26 +596,20 @@ const SizedBox(height: 20),
                                       ),
                                     ),
                                     const SizedBox(height: 10),
-                                    ElevatedButton(
-                                      onPressed: _pickImage,
-                                      style: ElevatedButton.styleFrom(
-                                          primary: Colors.blueAccent),
-                                      child: const Text('แนบไฟล์รูป',
-                                          style:
-                                              TextStyle(color: Colors.white)),
-                                    ),
+                                      ElevatedButton(
+              onPressed: _showImagePickerOptions,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+              child: const Text('แนบไฟล์รูป', style: TextStyle(color: Colors.white)),
+            ),
+
                                     selectedImage != null
                                         ? Column(
-                                            children: [
-                                              const SizedBox(height: 10),
-                                              Image.file(
-                                                selectedImage!,
-                                                width: 150,
-                                                height: 150,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ],
-                                          )
+                    children: [
+                      Image.file(selectedImage!, width: 150, height: 150, fit: BoxFit.cover),
+                      const SizedBox(height: 10),
+                      const Text("อัพโหลดสำเร็จ!", style: TextStyle(color: Colors.green)),
+                    ],
+                  )
                                         : Container(),
                                   ],
                                 ),
@@ -604,7 +624,6 @@ const SizedBox(height: 20),
                                             concertName: widget.concertName,
                                             date: widget.date,
                                             time: widget.time,
-                                            imagePath: widget.imagePath,
                                             location: widget.location,
                                             zoneName: widget.zoneName,
                                             selectedSeats: widget.selectedSeats,

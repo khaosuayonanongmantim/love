@@ -223,23 +223,23 @@ class SportDetail extends StatelessWidget {
                             color: Colors.black, // เปลี่ยนสีให้เด่น
                           ),
                         ),
-                         ElevatedButton(
+                        ElevatedButton(
                           onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SportPlan(
                                   imagePath: imagePath,
-                                  concertName: text1,
+                                  sportName: text1,
                                   date: formattedDate,
                                   time: text3,
                                   location: text4,
+                                  price: text5, // ส่ง sport หรือเปลี่ยนเป็นค่าอื่น ๆ ตามต้องการ
                                 ),
                               ),
-                              
                             );
                           },
-                           style: ElevatedButton.styleFrom(
+                          style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 const Color.fromARGB(255, 255, 41, 26),
                             shape: RoundedRectangleBorder(
@@ -256,7 +256,6 @@ class SportDetail extends StatelessWidget {
                             ),
                           ),
                         )
-                     
                       ],
                     ),
                   ),

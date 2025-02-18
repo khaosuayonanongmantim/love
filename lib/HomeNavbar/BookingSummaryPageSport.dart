@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:project_new/Payment/ReceiptConSportPage.dart';
 
 class BookingSummaryPageSport extends StatefulWidget {
-  final String concertName;
+  final String sportName;
   final String date;
   final String time;
   final String location;
@@ -16,9 +17,9 @@ class BookingSummaryPageSport extends StatefulWidget {
   final double serviceFee;
   final String imagePath; // เพิ่มตัวแปรรับรูปภาพ
 
-  const BookingSummaryPageSport({
+    const BookingSummaryPageSport({
     Key? key,
-    required this.concertName,
+    required this.sportName,
     required this.date,
     required this.time,
     required this.location,
@@ -29,17 +30,29 @@ class BookingSummaryPageSport extends StatefulWidget {
     required this.serviceFee,
     required this.imagePath, // รับค่ารูปภาพจาก ZoneDetailPage
   }) : super(key: key);
-
+  
   @override
-  _BookingSummaryPageSportState createState() =>
-      _BookingSummaryPageSportState();
+  _BookingSummaryPageSportState createState() => _BookingSummaryPageSportState();
 }
 
 class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+
   bool isChecked = false; // จัดการสถานะของ Checkbox
   File? selectedImage;
 
-  String formatDate(String dateString) {
+    // ตัวแปรสำหรับเก็บค่าฟอร์มของบัตรเครดิต
+  final TextEditingController cardNumberController = TextEditingController();
+  final TextEditingController cardHolderController = TextEditingController();
+  final TextEditingController cvvController = TextEditingController();
+  String? selectedMonth;
+  String? selectedYear;
+  final ImagePicker _picker = ImagePicker();
+
+    String formatDate(String dateString) {
     try {
       DateTime dateTime = DateTime.parse(dateString);
       return DateFormat('dd/MM/yyyy').format(dateTime);
@@ -48,24 +61,43 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
     }
   }
 
-  // ตัวแปรสำหรับเก็บค่าฟอร์มของบัตรเครดิต
-  final TextEditingController cardNumberController = TextEditingController();
-  final TextEditingController cardHolderController = TextEditingController();
-  final TextEditingController cvvController = TextEditingController();
-  String? selectedMonth;
-  String? selectedYear;
-
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
         selectedImage = File(pickedFile.path);
       });
     }
   }
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text("ถ่ายรูป"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text("เลือกรูปจากแกลเลอรี"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-  // ฟังก์ชันตรวจสอบฟอร์มบัตรเครดิต
+   // ฟังก์ชันตรวจสอบฟอร์มบัตรเครดิต
   bool _validateCardForm() {
     return cardNumberController.text.isNotEmpty &&
         cardHolderController.text.isNotEmpty &&
@@ -74,21 +106,44 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
         selectedYear != null;
   }
 
+
+  bool _isLoading = true; // เพิ่มตัวแสดง Loading
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+Future<void> _loadUserData() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  setState(() {
+    _firstNameController.text = prefs.getString('firstName') ?? '';
+    _lastNameController.text = prefs.getString('lastName') ?? '';
+    _phoneController.text = prefs.getString('phone') ?? '';
+    _emailController.text = prefs.getString('email') ?? '';
+    _isLoading = false;
+  });
+}
   @override
   Widget build(BuildContext context) {
-    String formattedDate = formatDate(widget.date);
+        String formattedDate = formatDate(widget.date);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('สรุปการจอง'),
-        backgroundColor: Colors.pinkAccent,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ข้อมูลผู้ซื้อบัตร
-            Container(
+        title: const Text("สรุปการจอง"),
+         backgroundColor: Colors.pinkAccent,
+        ),
+      
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator()) // แสดง Loading
+          : SingleChildScrollView(
+      
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Colors.orange[100],
@@ -106,36 +161,32 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: const [
+                 Row(
+                    children: [
                       Expanded(
                         child: TextField(
-                          decoration: InputDecoration(
-                            labelText: 'ชื่อ',
-                            border: OutlineInputBorder(),
-                          ),
+                          controller: _firstNameController,
+                          decoration: const InputDecoration(labelText: 'ชื่อ', border: OutlineInputBorder()),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
-                          decoration: InputDecoration(
-                            labelText: 'นามสกุล',
-                            border: OutlineInputBorder(),
-                          ),
+                          controller: _lastNameController,
+                          decoration: const InputDecoration(labelText: 'นามสกุล', border: OutlineInputBorder()),
                         ),
                       ),
                     ],
                   ),
+                 
                   const SizedBox(height: 10),
-                  TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'เบอร์โทรศัพท์',
-                      border: OutlineInputBorder(),
-                    ),
+               TextField(
+                    controller: _phoneController,
+                    decoration: const InputDecoration(labelText: 'เบอร์โทร', border: OutlineInputBorder()),
                   ),
                   const SizedBox(height: 10),
                   TextField(
+                    controller: _emailController,
                     decoration: const InputDecoration(
                       labelText: 'อีเมล',
                       border: OutlineInputBorder(),
@@ -144,10 +195,9 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                 ],
               ),
             ),
-            
-            const SizedBox(height: 20),
-
-            // สรุปรายการสั่งซื้อ
+         
+                  const SizedBox(height: 20),
+                   // สรุปรายการสั่งซื้อ
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -190,7 +240,7 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.concertName,
+                              widget.sportName,
                               style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -270,10 +320,8 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                 ],
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            // เงื่อนไขและการชำระเงิน
+const SizedBox(height: 20),
+  // เงื่อนไขและการชำระเงิน
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -321,8 +369,7 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
               ),
             ),
             const SizedBox(height: 20),
-
-            ExpansionTile(
+              ExpansionTile(
               title: const Text('เดบิต/เครดิตการ์ด',
                   style: TextStyle(color: Colors.red)),
               children: [
@@ -435,27 +482,25 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       ReceiptConSportPage(
-                                                    concertName:
-                                                        widget.concertName,
+                                                    concertName:widget.sportName,
                                                     date: widget.date,
-                                                    imagePath: widget.imagePath,
                                                     time: widget.time,
                                                     location: widget.location,
                                                     zoneName: widget.zoneName,
-                                                    selectedSeats:
-                                                        widget.selectedSeats,
-                                                    totalPrice:
-                                                        widget.totalPrice,
+                                                    selectedSeats:widget.selectedSeats,
+                                                    totalPrice:widget.totalPrice,
                                                     vatAmount: widget.vatAmount,
-                                                    serviceFee:
-                                                        widget.serviceFee,
+                                                    serviceFee:widget.serviceFee,
                                                   ),
                                                 ),
                                               );
                                             },
                                             style: ElevatedButton.styleFrom(
                                                 primary: Colors.redAccent),
-                                            child: const Text('ยืนยัน',style: TextStyle(color: Colors.white),),
+                                            child: const Text('ยืนยัน', style: TextStyle(
+                              color: Colors.white,
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
                                           ),
                                         ],
                                       );
@@ -474,7 +519,8 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                           child: const Text(
                             'ยืนยันการสั่งซื้อ',
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold,color: Colors.white),
+                              color: Colors.white,
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -483,7 +529,7 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                 ),
               ],
             ),
-            ExpansionTile(
+          ExpansionTile(
               title:
                   const Text('พร้อมเพย์', style: TextStyle(color: Colors.red)),
               children: [
@@ -550,26 +596,20 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                                       ),
                                     ),
                                     const SizedBox(height: 10),
-                                    ElevatedButton(
-                                      onPressed: _pickImage,
-                                      style: ElevatedButton.styleFrom(
-                                          primary: Colors.blueAccent),
-                                      child: const Text('แนบไฟล์รูป',
-                                          style:
-                                              TextStyle(color: Colors.white)),
-                                    ),
+                                      ElevatedButton(
+              onPressed: _showImagePickerOptions,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+              child: const Text('แนบไฟล์รูป', style: TextStyle(color: Colors.white)),
+            ),
+
                                     selectedImage != null
                                         ? Column(
-                                            children: [
-                                              const SizedBox(height: 10),
-                                              Image.file(
-                                                selectedImage!,
-                                                width: 150,
-                                                height: 150,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ],
-                                          )
+                    children: [
+                      Image.file(selectedImage!, width: 150, height: 150, fit: BoxFit.cover),
+                      const SizedBox(height: 10),
+                      const Text("อัพโหลดสำเร็จ!", style: TextStyle(color: Colors.green)),
+                    ],
+                  )
                                         : Container(),
                                   ],
                                 ),
@@ -579,21 +619,19 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                ReceiptConSportPage(
-                                                  concertName:
-                                                      widget.concertName,
-                                                  date: widget.date,
-                                                  time: widget.time,
-                                                  imagePath: widget.imagePath,
-                                                  location: widget.location,
-                                                  zoneName: widget.zoneName,
-                                                  selectedSeats:
-                                                      widget.selectedSeats,
-                                                  totalPrice: widget.totalPrice,
-                                                  vatAmount: widget.vatAmount,
-                                                  serviceFee: widget.serviceFee,
-                                                )),
+                                          builder: (context) =>
+                                              ReceiptConSportPage(
+                                            concertName: widget.sportName,
+                                            date: widget.date,
+                                            time: widget.time,
+                                            location: widget.location,
+                                            zoneName: widget.zoneName,
+                                            selectedSeats: widget.selectedSeats,
+                                            totalPrice: widget.totalPrice,
+                                            vatAmount: widget.vatAmount,
+                                            serviceFee: widget.serviceFee,
+                                          ),
+                                        ),
                                       );
                                     },
                                     child: const Text(
@@ -616,8 +654,11 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                         ),
                         child: const Text(
                           'แสดง QR Code',
+                          
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold,color: Colors.white),
+                            color: Colors.white,
+                              fontSize: 16,
+                               fontWeight: FontWeight.bold,),
                         ),
                       ),
                     ],
@@ -625,9 +666,13 @@ class _BookingSummaryPageSportState extends State<BookingSummaryPageSport> {
                 ),
               ],
             )
-          ],
-        ),
-      ),
+         
+                ],
+                
+              ),
+              
+            ),
+            
     );
   }
 }

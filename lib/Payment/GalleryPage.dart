@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerScreen extends StatefulWidget {
-
-
-  const ImagePickerScreen({
-    Key? key,
-  }) : super(key: key);
+  const ImagePickerScreen({Key? key}) : super(key: key);
 
   @override
   _ImagePickerScreenState createState() => _ImagePickerScreenState();
@@ -35,14 +31,6 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
         return Wrap(
           children: [
             ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text("ถ่ายรูป"),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.camera);
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text("เลือกรูปจากแกลเลอรี"),
               onTap: () {
@@ -59,26 +47,35 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("แนบไฟล์รูป")),
-      body: Center(
+      appBar: AppBar(
+        title: const Text("ไฟล์รูปภาพ"),
+        backgroundColor: const Color.fromARGB(255, 238, 98, 215),
+      ),
+      backgroundColor: const Color.fromARGB(255, 255, 208, 255),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start, // ✅ ปุ่มจะอยู่บนสุด
           children: [
             ElevatedButton(
               onPressed: _showImagePickerOptions,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
-              child: const Text('แนบไฟล์รูป', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 255, 68, 146)),
+              child: const Text('ดูไฟล์รูปภาพที่บันทึกไว้', style: TextStyle(color: Colors.white)),
             ),
-            const SizedBox(height: 10),
-            selectedImage != null
-                ? Column(
-                    children: [
-                      Image.file(selectedImage!, width: 150, height: 150, fit: BoxFit.cover),
-                      const SizedBox(height: 10),
-                      const Text("อัพโหลดสำเร็จ!", style: TextStyle(color: Colors.green)),
-                    ],
-                  )
-                : const Text("ยังไม่ได้เลือกไฟล์", style: TextStyle(color: Colors.red)),
+            const SizedBox(height: 20), // ✅ เพิ่มระยะห่างระหว่างปุ่มกับรูป
+            Expanded(
+              child: selectedImage != null
+                  ? Column(
+                      children: [
+                        Image.file(selectedImage!, width: 350, height: 400, fit: BoxFit.cover),
+                        const SizedBox(height: 10),
+                       
+                      ],
+                    )
+                  : const Center(
+                      child: Text("", style: TextStyle(color: Colors.red, fontSize: 16)),
+                    ),
+            ),
           ],
         ),
       ),

@@ -15,83 +15,85 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   bool _isLoading = false;
 
   // Function สำหรับการเข้าสู่ระบบ
   Future<void> login() async {
-  setState(() {
-    _isLoading = true;
-  });
-
-  // ตรวจสอบว่าอีเมลและรหัสผ่านถูกกรอกหรือไม่
-  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Please fill in both email and password")),
-    );
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
     });
-    return; // หยุดการทำงานถ้ากรอกข้อมูลไม่ครบ
-  }
-   final String apiUrl = "http://192.168.55.228:5000/login";
-  try {
-    final response = await http.post(
-  Uri.parse(apiUrl),
-  headers: {"Content-Type": "application/json"},
-  body: jsonEncode({
-    "email": _emailController.text.trim(),
-    "password": _passwordController.text,
-  }),
-);
 
-     // พิมพ์ข้อมูล Response เพื่อดูใน Terminal
-  print("Response Status Code: ${response.statusCode}");
-  print("Response Body: ${response.body}");
-
-   if (response.statusCode == 200) {
-  final data = json.decode(response.body);
-  print("Parsed Data: $data");
-  // print("Parsed User: ${data['user']}");
-
-  if (data['role'] == "user") {
-        // ⭐ บันทึกข้อมูลลง SharedPreferences ⭐
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('firstName', data['first_name'] ?? '');
-        await prefs.setString('lastName', data['last_name'] ?? '');
-        await prefs.setString('phone', data['phone'] ?? '');
-        await prefs.setString('email', data['email'] ?? '');
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Welcome, ${data['first_name']}")),
-        );
-
-
-   Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => BottomNavbar()),
-        );
-  } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: Invalid role.")),
-        );
-  }
-} else {
+    // ตรวจสอบว่ากรอกข้อมูลครบหรือไม่
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${response.statusCode}")),
+        const SnackBar(content: Text("Please fill in both email and password")),
       );
-}
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
 
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error: Unable to connect to the server")),
-    );
-  } finally {
-    setState(() {
-      _isLoading = false;
-    });
+    final String apiUrl = "http://192.168.55.228:5000/login";
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": _emailController.text.trim(),
+          "password": _passwordController.text,
+        }),
+      );
+
+      // พิมพ์ข้อมูล Response เพื่อตรวจสอบ
+      print("Response Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print("Parsed Data: $data");
+
+        if (data['role'] == "user") {
+          // ⭐ บันทึกข้อมูลลง SharedPreferences ⭐
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('userId', data['id'] ?? ''); // ✅ บันทึก userId
+          await prefs.setString('firstName', data['first_name'] ?? '');
+          await prefs.setString('lastName', data['last_name'] ?? '');
+          await prefs.setString('phone', data['phone'] ?? '');
+          await prefs.setString('email', data['email'] ?? '');
+
+          print("✅ User ID saved: ${data['id']}");
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Welcome, ${data['first_name']}")),
+          );
+
+          // ไปที่หน้า Home
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => BottomNavbar()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: Invalid role.")),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${response.statusCode}")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: Unable to connect to the server")),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -112,9 +114,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 end: Alignment.bottomLeft,
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 60.0, left: 22),
-              child: const Text(
+            child: const Padding(
+              padding: EdgeInsets.only(top: 60.0, left: 22),
+              child: Text(
                 'Hello\nSign in!',
                 style: TextStyle(
                   fontSize: 36,
@@ -151,8 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18.0, vertical: 24),
+                padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 24),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -184,9 +185,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     // Forgot Password
-                    Align(
+                    const Align(
                       alignment: Alignment.centerRight,
-                      child: const Text(
+                      child: Text(
                         'Forgot Password?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -204,8 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 15, horizontal: 100),
+                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
                       ),
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
